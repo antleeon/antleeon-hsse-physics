@@ -1,2 +1,2 @@
-# hsse-physics-m1
-HSSE physics modelling course simulation 1 (task M1)
+# antleeon-hsse-physics
+HSSE physics modelling course simulation tasks by Antleeõn
