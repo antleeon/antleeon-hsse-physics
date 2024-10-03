@@ -6,7 +6,7 @@ def set_objects():
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
     pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
-    objects.append(Object(image, (1, 1), (-10, 0), (15, 60)))
+    objects.append(Object(image, (0.1, 0.1), (-0.5, 0), (3, 60)))
     return objects
 
 def set_background():
