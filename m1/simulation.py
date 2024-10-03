@@ -5,7 +5,7 @@ class Simulation:
 
     UPDATE_INTERVAL = 30
     SIMULATION_NAME = 'Simulation'
-    DRAW_SCALE = 40
+    DRAW_SCALE = 30
     # constants
     def __init__(self, process, window_dimensions = (WINDOW_WIDTH, WINDOW_HEIGHT), update_interval = UPDATE_INTERVAL, window_name = SIMULATION_NAME, draw_scale = DRAW_SCALE) -> None:
         self.process = process
