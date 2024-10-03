@@ -5,13 +5,13 @@ class Simulation:
 
     UPDATE_INTERVAL = 30
     SIMULATION_NAME = 'Simulation'
-    DRAW_SCALE = 20
+    DRAW_SCALE = 40
     # constants
     def __init__(self, process, window_dimensions = (WINDOW_WIDTH, WINDOW_HEIGHT), update_interval = UPDATE_INTERVAL, window_name = SIMULATION_NAME, draw_scale = DRAW_SCALE) -> None:
         self.process = process
         self.pg = __import__('pygame')
         self.pg.init()
-        self.screen = self.pg.display.set_mode(window_dimensions)
+        self.screen = self.pg.display.set_mode(window_dimensions, self.pg.DOUBLEBUF)
         self.pg.display.set_caption(window_name)
         self.update_interval = update_interval
         self.draw_scale = draw_scale
