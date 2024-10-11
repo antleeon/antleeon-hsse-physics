@@ -17,8 +17,7 @@ class Process:
             screen_w, screen_h = screen.get_size()
             center_x, center_y = screen_w / 2, screen_h / 2
             pix_x = center_x + (obj_x * scale) - (image_w / 2)
-            pix_y = center_y + (obj_y * scale) - (image_h / 2)
+            pix_y = center_y - (obj_y * scale) + (image_h / 2)
 
             self.display.blit(image_scaled, (pix_x, pix_y))
-            print(image_w, image_h, pix_x, pix_y) # logging
         screen.blit(self.resize(self.display, screen.get_size()), (0,0))

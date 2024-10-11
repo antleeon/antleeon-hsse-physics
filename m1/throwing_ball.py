@@ -1,6 +1,9 @@
 from object import Object
 import pygame as pg
 import math
+import some_math
+
+MIN_Y_POSITION = -0.15
 
 def set_objects():
     objects = list()
@@ -10,52 +13,55 @@ def set_objects():
     return objects
 
 def set_background():
-    background = pg.Surface((1200, 800))
+    background = pg.Surface((800, 800))
     background.fill((255, 255, 255))
     return background
 
-def update_function(self, passed_time):
-    def to_radians(angle):
-        return (angle * math.pi / 180)
-    
-    def to_degrees(angle):
-        return (angle * 180 / math.pi)
-    
-    def vect_to_coord(vector):
-        length, angle = vector
-        x = length * math.cos(to_radians(angle))
-        y = length * math.sin(to_radians(angle))
-        return (x, y)
-
-    def coord_to_vect(coordinates):
-        x, y = coordinates
-        length = ((x ** 2) + (y ** 2)) ** 0.5
-        angle = to_degrees(math.atan2(y, x))
-        return (length, angle)
-    
-    def sum_vectors(vectors):
-        x, y = 0, 0
-        for v in vectors:
-            x_shift, y_shift = vect_to_coord(v)
-            x += x_shift
-            y += y_shift
-        return (coord_to_vect((x, y)))
-    
+def update_function_line(self, passed_time):
     def update_motion(coordinates, speed, acceleration, time):
-        x, y = coordinates
-        speed_x, speed_y = vect_to_coord(speed)
-        accel_x, accel_y = vect_to_coord(acceleration)
-        
-        x += (speed_x * time) + (accel_x * (time ** 2) / 2)
-        y -= (speed_y * time) + (accel_y * (time ** 2) / 2)
-        speed_x += accel_x * time
-        speed_y += accel_y * time
-
-        return ((x, y), coord_to_vect((speed_x, speed_y)))
+        new_speed = some_math.sum_vectors([speed, some_math.vector_times(acceleration, time)])
+        average_speed = some_math.sum_vectors([some_math.vector_times(speed, 0.5), some_math.vector_times(new_speed, 0.5)])
+        shift = some_math.vector_times(average_speed, time)
+        new_coordinates = some_math.move_point_by_vector(coordinates, (shift[0], shift[1]))
+        print(coordinates) # logging
+        return (new_coordinates, new_speed)
 
     accelerators = [(9.8, -90)]
-    acceleration = sum_vectors(accelerators)
+    acceleration = some_math.sum_vectors(accelerators)
     sec_time = passed_time / 1000
 
     for obj in self.objects:
-        obj.position, obj.speed = update_motion(obj.position, obj.speed, acceleration, sec_time)
+        if ((obj.position)[1] > MIN_Y_POSITION):
+            obj.position, obj.speed = update_motion(obj.position, obj.speed, acceleration, sec_time)
+        else:
+            obj.position = (obj.position[0], MIN_Y_POSITION)
+
+def update_function_curve(self, passed_time):
+    def update_motion(coordinates, speed, acceleration, time):
+        accel_tang = some_math.projection(acceleration, speed)
+        accel_norm = some_math.projection(acceleration, some_math.perpendicular(speed))
+        moving_clockwise = (math.sin(some_math.to_radians(speed[1] - accel_norm[1])) > 0)
+        angle_multyplier = (1 * (not moving_clockwise)) + (-1 * (moving_clockwise))
+        radius = (speed[0] ** 2) / accel_norm[0]
+        circle_center = some_math.move_point_by_vector(coordinates, (radius, accel_norm[1]))
+        circle_len = some_math.circle_length(radius)
+        curve_len = (speed[0] * time) + (accel_tang[0] * (time ** 2) * 0.5)
+        curve_angle = 360 * (curve_len / circle_len)
+        move_angle = curve_angle * angle_multyplier
+        start_point_angle = (some_math.vector_times(accel_norm, -1))[1]
+        end_point_angle = start_point_angle + move_angle
+        new_coordinates = some_math.move_point_by_vector(circle_center, (radius, end_point_angle))
+        # new_speed = (speed[0] + (accel_tang[0] * time), speed[1] + move_angle)
+        new_speed = some_math.sum_vectors([speed, some_math.vector_times(acceleration, time)])
+        print(coordinates) # logging
+        return (new_coordinates, new_speed)
+
+    accelerators = [(9.8, -90)]
+    acceleration = some_math.sum_vectors(accelerators)
+    sec_time = passed_time / 1000
+
+    for obj in self.objects:
+        if ((obj.position)[1] > MIN_Y_POSITION):
+            obj.position, obj.speed = update_motion(obj.position, obj.speed, acceleration, sec_time)
+        else:
+            obj.position = (obj.position[0], MIN_Y_POSITION)
