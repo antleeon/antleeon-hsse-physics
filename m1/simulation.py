@@ -1,7 +1,7 @@
 class Simulation:
     # constants
     WINDOW_WIDTH = 1600
-    WINDOW_HEIGHT = 800
+    WINDOW_HEIGHT = 1000
 
     DEFAULT_UPDATE_INTERVAL = 50
     MIN_INTERVAL = 5
@@ -47,8 +47,10 @@ class Simulation:
         quantity = len(self.processes)
         screen_width, screen_height = self.screen.get_size()
 
-        width = screen_width // quantity
-        height = screen_height
+        #width = screen_width // quantity
+        #height = screen_height TODO
+        width = screen_width // 2
+        height = screen_height // 2
 
         subscreen = self.pg.Surface((width, height))
         return subscreen
