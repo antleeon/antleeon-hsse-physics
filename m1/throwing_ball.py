@@ -9,7 +9,10 @@ def set_objects():
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
     pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
-    objects.append(Object(image, (0.1, 0.1), (-0.45, 0), (3, 60)))
+    objects.append(Object(image, radius = 0.05,
+                                 position = (-0.45, 0),
+                                 speed = (3, 60),
+                                 mass = 0.3))
     return objects
 
 def set_background():
@@ -52,10 +55,22 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
                           'linear': update_motion_linear}
 
     def air_resistance_linear(object):
-        return 0
+        AIR_VISCOSITY = 1.78 * (10 ** (-5))
+        
+        force_abs = 6 * math.pi * AIR_VISCOSITY * object.radius * abs(object.speed[0])
+        acceleration_abs = force_abs / object.mass
+
+        return acceleration_abs
     
     def air_resistance_quadratic(object):
-        return 0
+        AIR_DENSITY = 1.225
+        DRAG_COEFFICIENT = 0.47
+
+        reference_area = math.pi * (object.radius ** 2)
+        force_abs = 0.5 * AIR_DENSITY * (object.speed[0] ** 2) * DRAG_COEFFICIENT * reference_area
+        acceleration_abs = force_abs / object.mass
+        
+        return acceleration_abs
     
     air_resistance_dict = {'linear': air_resistance_linear,
                            'quadratic': air_resistance_quadratic}
