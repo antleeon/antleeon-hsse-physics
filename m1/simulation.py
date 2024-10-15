@@ -3,24 +3,27 @@ class Simulation:
     WINDOW_WIDTH = 1600
     WINDOW_HEIGHT = 800
 
-    UPDATE_INTERVAL = 30
+    DEFAULT_UPDATE_INTERVAL = 30
+    TIME_SCALE = 0.2
+
     SIMULATION_NAME = 'Simulation'
     DRAW_SCALE = 800
     # constants
-    def __init__(self, processes, window_dimensions = (WINDOW_WIDTH, WINDOW_HEIGHT), update_interval = UPDATE_INTERVAL, window_name = SIMULATION_NAME, draw_scale = DRAW_SCALE) -> None:
+    def __init__(self, processes, **kwargs) -> None:
         self.processes = processes
         self.pg = __import__('pygame')
         self.pg.init()
-        self.screen = self.pg.display.set_mode(window_dimensions, self.pg.DOUBLEBUF)
-        self.pg.display.set_caption(window_name)
-        self.update_interval = update_interval
-        self.draw_scale = draw_scale
+        self.screen = self.pg.display.set_mode(kwargs.get('window_dimensions', (self.WINDOW_WIDTH, self.WINDOW_HEIGHT)), self.pg.DOUBLEBUF)
+        self.pg.display.set_caption(kwargs.get('window_name', self.SIMULATION_NAME))
+        self.reset_update_interval()
+        self.time_scale = kwargs.get('time_scale', self.TIME_SCALE)
+        self.draw_scale = kwargs.get('draw_scale', self.DRAW_SCALE)
 
     def consider_event(self, event) -> bool:
         return (event.type != self.pg.QUIT)
     
     def reset_update_interval(self) -> None:
-        self.update_interval = self.update_interval
+        self.update_interval = self.DEFAULT_UPDATE_INTERVAL
 
     def get_subscreen(self):
         quantity = len(self.processes)
@@ -42,7 +45,7 @@ class Simulation:
     def update_processes(self) -> None:
         subscreen = self.get_subscreen()
         for i, process in enumerate(self.processes):
-            process.update(self.update_interval)
+            process.update(self.update_interval * self.time_scale)
             curr_subscreen = subscreen
             process.redraw(curr_subscreen, self.draw_scale)
             self.screen.blit(curr_subscreen, self.get_subscreen_position(i))

@@ -23,7 +23,6 @@ def update_function_line(self, passed_time):
         average_speed = some_math.sum_vectors([some_math.vector_times(speed, 0.5), some_math.vector_times(new_speed, 0.5)])
         shift = some_math.vector_times(average_speed, time)
         new_coordinates = some_math.move_point_by_vector(coordinates, (shift[0], shift[1]))
-        print(coordinates) # logging
         return (new_coordinates, new_speed)
 
     accelerators = [(9.8, -90)]
@@ -53,7 +52,6 @@ def update_function_curve(self, passed_time):
         new_coordinates = some_math.move_point_by_vector(circle_center, (radius, end_point_angle))
         # new_speed = (speed[0] + (accel_tang[0] * time), speed[1] + move_angle)
         new_speed = some_math.sum_vectors([speed, some_math.vector_times(acceleration, time)])
-        print(coordinates) # logging
         return (new_coordinates, new_speed)
 
     accelerators = [(9.8, -90)]
