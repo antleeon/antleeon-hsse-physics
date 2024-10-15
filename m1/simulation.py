@@ -3,8 +3,11 @@ class Simulation:
     WINDOW_WIDTH = 1600
     WINDOW_HEIGHT = 800
 
-    DEFAULT_UPDATE_INTERVAL = 30
+    DEFAULT_UPDATE_INTERVAL = 50
+    MIN_INTERVAL = 5
     TIME_SCALE = 0.2
+
+    APPROXIMATION = 0.01
 
     SIMULATION_NAME = 'Simulation'
     DRAW_SCALE = 800
@@ -18,12 +21,27 @@ class Simulation:
         self.reset_update_interval()
         self.time_scale = kwargs.get('time_scale', self.TIME_SCALE)
         self.draw_scale = kwargs.get('draw_scale', self.DRAW_SCALE)
+        self.approximation = kwargs.get('approximation', self.APPROXIMATION)
 
     def consider_event(self, event) -> bool:
         return (event.type != self.pg.QUIT)
     
     def reset_update_interval(self) -> None:
-        self.update_interval = self.DEFAULT_UPDATE_INTERVAL
+        def count_time_interval(object):
+            accel = getattr(object, 'last_acceleration', (0, 0))
+            speed = getattr(object, 'speed', (0, 0))
+            accel_proj = __import__('some_math').projection(accel, speed)
+            sp_abs = abs(speed[0])
+            ac_abs = abs(accel_proj[0])
+            if not ((sp_abs > 0) and (ac_abs > 0) and (self.approximation > 0)):
+                return self.DEFAULT_UPDATE_INTERVAL
+            return (((self.approximation * sp_abs / ac_abs) * 1000) / self.time_scale)
+
+        interval = self.DEFAULT_UPDATE_INTERVAL
+        for process in self.processes:
+            for object in process.objects:
+                interval = min(count_time_interval(object), interval)
+        self.update_interval = max(int(interval), self.MIN_INTERVAL)
 
     def get_subscreen(self):
         quantity = len(self.processes)

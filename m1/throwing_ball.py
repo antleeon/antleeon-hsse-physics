@@ -32,8 +32,10 @@ def update_function_line(self, passed_time):
     for obj in self.objects:
         if ((obj.position)[1] > MIN_Y_POSITION):
             obj.position, obj.speed = update_motion(obj.position, obj.speed, acceleration, sec_time)
+            obj.last_acceleration = acceleration
         else:
             obj.position = (obj.position[0], MIN_Y_POSITION)
+            obj.last_acceleration = (0, 0)
 
 def update_function_curve(self, passed_time):
     def update_motion(coordinates, speed, acceleration, time):
@@ -61,5 +63,7 @@ def update_function_curve(self, passed_time):
     for obj in self.objects:
         if ((obj.position)[1] > MIN_Y_POSITION):
             obj.position, obj.speed = update_motion(obj.position, obj.speed, acceleration, sec_time)
+            obj.last_acceleration = acceleration
         else:
             obj.position = (obj.position[0], MIN_Y_POSITION)
+            obj.last_acceleration = (0, 0)
