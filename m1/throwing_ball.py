@@ -2,17 +2,16 @@ from object import Object
 import pygame as pg
 import math
 import some_math
-
-MIN_Y_POSITION = -0.1
+import constants as const
 
 def set_objects():
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
     pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
-    objects.append(Object(image, radius = 0.05,
+    objects.append(Object(image, radius = const.RADIUS,
                                  position = (-0.45, 0),
-                                 speed = (3, 60),
-                                 mass = 0.3))
+                                 speed = const.SPEED,
+                                 mass = const.MASS))
     return objects
 
 def set_background():
@@ -55,7 +54,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
                           'linear': update_motion_linear}
 
     def air_resistance_linear(object):
-        AIR_VISCOSITY = 1.78 * (10 ** (-5))
+        AIR_VISCOSITY = const.ENVIRONMENT_VISCOSITY
         
         force_abs = 6 * math.pi * AIR_VISCOSITY * object.radius * abs(object.speed[0])
         acceleration_abs = force_abs / object.mass
@@ -63,8 +62,8 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
         return acceleration_abs
     
     def air_resistance_quadratic(object):
-        AIR_DENSITY = 1.225
-        DRAG_COEFFICIENT = 0.47
+        AIR_DENSITY = const.ENVIRONMENT_DENSITY
+        DRAG_COEFFICIENT = const.DRAG_COEFFICIENT
 
         reference_area = math.pi * (object.radius ** 2)
         force_abs = 0.5 * AIR_DENSITY * (object.speed[0] ** 2) * DRAG_COEFFICIENT * reference_area
@@ -74,6 +73,8 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     
     air_resistance_dict = {'linear': air_resistance_linear,
                            'quadratic': air_resistance_quadratic}
+
+    MIN_Y_POSITION = -const.HEIGHT
 
     accelerators = [(9.8, -90)]
     acceleration = some_math.sum_vectors(accelerators)
