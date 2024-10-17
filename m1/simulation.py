@@ -1,3 +1,6 @@
+import output
+from time_management import now_milliseconds_since_month as timestamp
+
 class Simulation:
     # constants
     WINDOW_WIDTH = 1600
@@ -7,7 +10,7 @@ class Simulation:
     MIN_INTERVAL = 5
     TIME_SCALE = 0.2
 
-    APPROXIMATION = 0.01
+    APPROXIMATION = 0.001
 
     SIMULATION_NAME = 'Simulation'
     DRAW_SCALE = 800
@@ -30,9 +33,8 @@ class Simulation:
         def count_time_interval(object):
             accel = getattr(object, 'last_acceleration', (0, 0))
             speed = getattr(object, 'speed', (0, 0))
-            accel_proj = __import__('some_math').projection(accel, speed)
             sp_abs = abs(speed[0])
-            ac_abs = abs(accel_proj[0])
+            ac_abs = abs(accel[0])
             if not ((sp_abs > 0) and (ac_abs > 0) and (self.approximation > 0)):
                 return self.DEFAULT_UPDATE_INTERVAL
             return (((self.approximation * sp_abs / ac_abs) * 1000) / self.time_scale)
@@ -65,13 +67,27 @@ class Simulation:
     def update_processes(self) -> None:
         subscreen = self.get_subscreen()
         for i, process in enumerate(self.processes):
-            process.update(self.update_interval * self.time_scale)
+            if (process.process_state != 1):
+                update_time = timestamp()
+                time_passed = update_time - process.last_updated
+                process.update(time_passed * self.time_scale)
+                process.last_updated = update_time
+            elif (not process.result_printed):
+                real_process_time = (process.end_time - process.begin_time) * self.time_scale / 1000
+                object_coordinates = process.objects[0].position
+                process_info = process.info
+                output.print_result(f'Got with settings "{process_info}":', (real_process_time, object_coordinates))
+                process.result_printed = True
             curr_subscreen = subscreen
             process.redraw(curr_subscreen, self.draw_scale)
             self.screen.blit(curr_subscreen, self.get_subscreen_position(i))
         self.reset_update_interval()
     
     def run_processes(self) -> None:
+        for process in self.processes:
+            process.result_printed = False
+            process.last_updated = timestamp()
+        
         while True:
             events_list = self.pg.event.get()
             for event in events_list:

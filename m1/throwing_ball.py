@@ -3,13 +3,14 @@ import pygame as pg
 import math
 import some_math
 import constants as const
+from time_management import now_milliseconds_since_month as timestamp
 
 def set_objects():
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
     pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
     objects.append(Object(image, radius = const.RADIUS,
-                                 position = (-0.45, 0),
+                                 position = (const.X_0, 0),
                                  speed = const.SPEED,
                                  mass = const.MASS))
     return objects
@@ -76,17 +77,23 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
 
     MIN_Y_POSITION = -const.HEIGHT
 
-    accelerators = [(9.8, -90)]
+    accelerators = [const.GRAVITATIONAL_ACCELERATION]
     acceleration = some_math.sum_vectors(accelerators)
     sec_time = passed_time / 1000
 
     update_motion = update_motion_dict.get(motion_type, update_motion_linear)
     air_resistance = air_resistance_dict.get(air_resistance_type, air_resistance_linear)
-    
+
     for obj in self.objects:
         if ((obj.position)[1] > MIN_Y_POSITION):
             obj.position, obj.speed = update_motion(obj, acceleration, air_resistance, sec_time)
             obj.last_acceleration = acceleration
-        else:
-            obj.position = (obj.position[0], MIN_Y_POSITION)
+
+            if (self.process_state == -1):
+                self.process_state = 0
+                self.begin_time = timestamp()
+        elif (self.process_state != 1):
             obj.last_acceleration = (0, 0)
+            self.process_state = 1
+            self.end_time = timestamp()
+

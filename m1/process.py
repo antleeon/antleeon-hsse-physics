@@ -1,10 +1,12 @@
 class Process:
-    def __init__(self, objects, update, background) -> None:
+    def __init__(self, objects, update, background, info) -> None:
+        self.info = info
         self.objects = objects
         self.update = __import__('types').MethodType(update, self)
         self.background = background
         self.display = __import__('pygame').Surface(background.get_size())
         self.resize = __import__('pygame').transform.scale
+        self.process_state = -1
     
     def redraw(self, screen, scale = 1) -> None:
         self.display.blit(self.background, (0,0))
