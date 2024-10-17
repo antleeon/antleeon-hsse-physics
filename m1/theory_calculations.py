@@ -36,11 +36,9 @@ def count(air_resistance_type):
         
         return height
     
-    def height_func_quadratic_resistance(t):
-        return
+    # def height_func_quadratic_resistance(t): TODO
     
-    height_funcs_dict = {'linear': height_func_linear_resistance,
-                         'quadratic': height_func_quadratic_resistance}
+    height_funcs_dict = {'linear': height_func_linear_resistance}
 
     def distance_func_linear_resistance(t):
         m = const.MASS
@@ -52,11 +50,9 @@ def count(air_resistance_type):
         
         return distance
     
-    def distance_func_quadratic_resistance(t):
-        return
+    # def distance_func_quadratic_resistance(t): TODO
     
-    distance_funcs_dict = {'linear': distance_func_linear_resistance,
-                            'quadratic': distance_func_quadratic_resistance}
+    distance_funcs_dict = {'linear': distance_func_linear_resistance}
     
     def get_height_predicate(height_f, height_needed):
         def predicate(time):
