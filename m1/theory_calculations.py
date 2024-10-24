@@ -6,12 +6,8 @@ import math
 def height_func_linear_resistance(t):
     m = const.MASS
     g = const.GRAVITATIONAL_ACCELERATION[0]
-    k = 6 * math.pi * const.ENVIRONMENT_VISCOSITY * const.RADIUS
-    v_0_vertical = some_math.vector_to_standard(some_math.projection(const.SPEED, (1, 90)))
-    if (0 <= v_0_vertical[1] <= 180):
-        v_0_y = v_0_vertical[0]
-    else:
-        v_0_y = -v_0_vertical[0]
+    k = 6 * math.pi * const.KINEMATIC_VISCOSITY * const.ENVIRONMENT_DENSITY * const.RADIUS
+    v_0_y = (some_math.projection_codirectional(const.SPEED, (1, 90)))[0]
     e = math.e
 
     height = (m / k) * (((m * g / k) + v_0_y) * (1 - (e ** (-k * t / m))) - (g * t))
@@ -24,12 +20,8 @@ height_funcs_dict = {'linear': height_func_linear_resistance}
 
 def distance_func_linear_resistance(t):
     m = const.MASS
-    k = 6 * math.pi * const.ENVIRONMENT_VISCOSITY * const.RADIUS
-    v_0_horizontal = (some_math.projection(const.SPEED, (1, 0)))
-    if (-90 <= v_0_horizontal[1] <= 90):
-        v_0_x = v_0_horizontal[0]
-    else:
-        v_0_x = -v_0_horizontal[0]
+    k = 6 * math.pi * const.KINEMATIC_VISCOSITY * const.ENVIRONMENT_DENSITY * const.RADIUS
+    v_0_x = (some_math.projection_codirectional(const.SPEED, (1, 0)))[0]
     e = math.e
 
     distance = (m * v_0_x / k) * (1 - (e ** (-k * t / m)))

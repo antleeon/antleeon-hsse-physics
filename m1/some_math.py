@@ -39,6 +39,12 @@ def projection(vector, onto):
     length = or_len * math.cos(to_radians(angle - or_ang))
     return vector_to_standard((length, angle))
 
+def projection_codirectional(vector, onto):
+    _, angle = vector_to_standard(onto)
+    or_len, or_ang = vector
+    length = or_len * math.cos(to_radians(angle - or_ang))
+    return (length, angle)
+
 def perpendicular(vector):
     length, angle = vector
     angle += 90

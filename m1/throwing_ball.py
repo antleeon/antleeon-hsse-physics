@@ -25,7 +25,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     def update_motion_curved(obj, acceleration, resistance, time):
         speed = obj.speed
         coordinates = obj.position
-        accel_tang = some_math.projection(acceleration, speed)
+        accel_tang = some_math.projection_codirectional(acceleration, speed)
         accel_norm = some_math.projection(acceleration, some_math.perpendicular(speed))
         air_accel_abs = resistance(obj)
         moving_clockwise = (math.sin(some_math.to_radians(speed[1] - accel_norm[1])) > 0)
@@ -56,7 +56,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
                           'linear': update_motion_linear}
 
     def air_resistance_linear(object):
-        AIR_VISCOSITY = const.ENVIRONMENT_VISCOSITY
+        AIR_VISCOSITY = const.KINEMATIC_VISCOSITY * const.ENVIRONMENT_DENSITY
         
         force_abs = 6 * math.pi * AIR_VISCOSITY * object.radius * abs(object.speed[0])
         acceleration_abs = force_abs / object.mass

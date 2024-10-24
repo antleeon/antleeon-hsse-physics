@@ -11,7 +11,7 @@ X_0, Y_0 = 0, 0 # meters (in relation to abstract coordinate center)
 # starting conditions
 
 # environment conditions
-ENVIRONMENT_VISCOSITY = 1.78 * (10 ** (-5))
+KINEMATIC_VISCOSITY = 1.47 * (10 ** (-5))
 ENVIRONMENT_DENSITY = 1.225
 GRAVITATIONAL_ACCELERATION = (9.8, -90) 
 # environment conditions
@@ -21,11 +21,13 @@ DRAWING_OPACITY = 150 # color opacity as an alpha channel value in RGBA format
 TRACE_SEGMENT_LENGTH = 0.6 # length of stroke length in relation to whole segment's length when grawing trace (between 0 and 1)
 TRACE_LINE_WIDTH = 3 # width of the trace line in pixels
 OPTIMAL_SIMULATION_TIME = 5 # seconds
-SCREEN_PADDING = 0.2 # respectful dimension part
+SCREEN_PADDING = 30 # pixels
 MIN_DRAWN_RADIUS = 10 # pixels
 MAX_DRAWN_RADIUS = 100 # pixels
 MAX_SCREEN_WIDTH = 1800 # pixels
 MAX_SCREEN_HEIGHT = 1000 # pixels
+MIN_SCREEN_WIDTH = 500 # pixels
+MIN_SCREEN_HEIGHT = 500 # pixels
 # technical settings
 
 # theoretical calculations settings
