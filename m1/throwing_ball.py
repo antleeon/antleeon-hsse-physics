@@ -10,14 +10,14 @@ def set_objects(color_no_alpha = (255, 0, 0)):
     image = pg.Surface((100, 100), pg.SRCALPHA)
     pg.draw.circle(image, (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY), (50, 50), 50)
     objects.append(Object(image, radius = const.RADIUS,
-                                 position = (const.X_0, 0),
+                                 position = (const.X_0, const.Y_0),
                                  speed = const.SPEED,
                                  mass = const.MASS,
                                  trace_color = color_no_alpha))
     return objects
 
-def set_background():
-    background = pg.Surface((1600, 1000), pg.SRCALPHA)
+def set_background(screen_size):
+    background = pg.Surface((screen_size), pg.SRCALPHA)
     background.fill((0, 0, 0, 0))
     return background
 
@@ -76,7 +76,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     air_resistance_dict = {'linear': air_resistance_linear,
                            'quadratic': air_resistance_quadratic}
 
-    MIN_Y_POSITION = -const.HEIGHT
+    MIN_Y_POSITION = const.Y_F
 
     accelerators = [const.GRAVITATIONAL_ACCELERATION]
     acceleration = some_math.sum_vectors(accelerators)
@@ -106,3 +106,18 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
 
     return trace_data
 
+def theory_trace(self):
+    self.begin_time = 0
+    self.end_time = 0
+    self.process_state = 1
+    self.result_printed = True
+
+    calc = __import__('theory_calculations')
+    theory_time = calc.count('linear')[0]
+    trace_points_coordinates = calc.count_trace('linear', theory_time)[0]
+
+    trace_data = list()
+    for i in range(len(trace_points_coordinates) - 1):
+        trace_data.append((trace_points_coordinates[i], trace_points_coordinates[i + 1], (0, 0, 0)))
+    
+    return trace_data
