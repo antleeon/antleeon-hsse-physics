@@ -5,19 +5,20 @@ import some_math
 import constants as const
 from time_management import now_milliseconds_since_month as timestamp
 
-def set_objects():
+def set_objects(color_no_alpha = (255, 0, 0)):
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
-    pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
+    pg.draw.circle(image, (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY), (50, 50), 50)
     objects.append(Object(image, radius = const.RADIUS,
                                  position = (const.X_0, 0),
                                  speed = const.SPEED,
-                                 mass = const.MASS))
+                                 mass = const.MASS,
+                                 trace_color = color_no_alpha))
     return objects
 
 def set_background():
-    background = pg.Surface((800, 500))
-    background.fill((255, 255, 255))
+    background = pg.Surface((1600, 1000), pg.SRCALPHA)
+    background.fill((0, 0, 0, 0))
     return background
 
 def update_function(self, passed_time, motion_type, air_resistance_type):
@@ -84,10 +85,16 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     update_motion = update_motion_dict.get(motion_type, update_motion_linear)
     air_resistance = air_resistance_dict.get(air_resistance_type, air_resistance_linear)
 
+    trace_data = list()
+
     for obj in self.objects:
         if ((obj.position)[1] > MIN_Y_POSITION):
+            last_position = obj.position
             obj.position, obj.speed = update_motion(obj, acceleration, air_resistance, sec_time)
             obj.last_acceleration = acceleration
+            new_position = obj.position
+
+            trace_data.append((last_position, new_position, obj.trace_color))
 
             if (self.process_state == -1):
                 self.process_state = 0
@@ -96,4 +103,6 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
             obj.last_acceleration = (0, 0)
             self.process_state = 1
             self.end_time = timestamp()
+
+    return trace_data
 

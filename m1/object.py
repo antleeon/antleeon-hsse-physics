@@ -4,6 +4,7 @@ class Object:
     POSITION = (0, 0)
     SIZE = (1, 1)
     MASS = 1
+    TRACE_COLOR = (0, 0, 0)
     # constants
 
     def __init__(self, image, **kwargs) -> None:
@@ -15,3 +16,4 @@ class Object:
         if ('radius' in kwargs.keys()):
             self.radius = kwargs['radius']
             self.size = (self.radius * 2, self.radius * 2)
+        self.trace_color = kwargs.get('trace_color', self.TRACE_COLOR)

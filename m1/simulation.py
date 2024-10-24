@@ -13,7 +13,7 @@ class Simulation:
     APPROXIMATION = 0.001
 
     SIMULATION_NAME = 'Simulation'
-    DRAW_SCALE = 800
+    DRAW_SCALE = 1400
     # constants
     def __init__(self, processes, **kwargs) -> None:
         self.processes = processes
@@ -23,7 +23,6 @@ class Simulation:
         self.pg.display.set_caption(kwargs.get('window_name', self.SIMULATION_NAME))
         self.reset_update_interval()
         self.time_scale = kwargs.get('time_scale', self.TIME_SCALE)
-        self.draw_scale = kwargs.get('draw_scale', self.DRAW_SCALE)
         self.approximation = kwargs.get('approximation', self.APPROXIMATION)
 
     def consider_event(self, event) -> bool:
@@ -51,10 +50,11 @@ class Simulation:
 
         #width = screen_width // quantity
         #height = screen_height TODO
-        width = screen_width // 2
-        height = screen_height // 2
+        width = screen_width
+        height = screen_height
 
-        subscreen = self.pg.Surface((width, height))
+        subscreen = self.pg.Surface((width, height), self.pg.SRCALPHA)
+        subscreen.fill((0, 0, 0, 0))
         return subscreen
     
     def get_subscreen_position(self, index):
@@ -62,24 +62,30 @@ class Simulation:
         width, height = self.get_subscreen().get_size()
         x = width * (index % (screen_width // width))
         y = height * (index // (screen_width // width))
-        return (x, y)
+        #return(x, y)
+
+        return (0, 0)
     
     def update_processes(self) -> None:
+        self.screen.fill((255, 255, 255))
         subscreen = self.get_subscreen()
         for i, process in enumerate(self.processes):
             if (process.process_state != 1):
                 update_time = timestamp()
                 time_passed = update_time - process.last_updated
-                process.update(time_passed * self.time_scale)
+                trace_data = process.update(time_passed * self.time_scale)
                 process.last_updated = update_time
+
+                for segment in trace_data:
+                    process.add_trace_segment(segment[0], segment[1], segment[2])
             elif (not process.result_printed):
                 real_process_time = (process.end_time - process.begin_time) * self.time_scale / 1000
                 object_coordinates = process.objects[0].position
                 process_info = process.info
                 output.print_result(f'Got with settings "{process_info}":', (real_process_time, object_coordinates))
                 process.result_printed = True
-            curr_subscreen = subscreen
-            process.redraw(curr_subscreen, self.draw_scale)
+            curr_subscreen = subscreen.copy()
+            process.redraw(curr_subscreen)
             self.screen.blit(curr_subscreen, self.get_subscreen_position(i))
         self.reset_update_interval()
     
