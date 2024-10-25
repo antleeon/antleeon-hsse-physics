@@ -1,25 +1,85 @@
+import constants as const
+import some_math
+
 class Process:
-    def __init__(self, objects, update, background, info) -> None:
+    def __init__(self, objects, update, background, center_point = (0, 0), scale = 1, info = '') -> None:
         self.info = info
         self.objects = objects
         self.update = __import__('types').MethodType(update, self)
         self.background = background
-        self.display = __import__('pygame').Surface(background.get_size())
+        self.display = __import__('pygame').Surface(background.get_size(), __import__('pygame').SRCALPHA)
+        self.trace_screen = self.display.copy()
+        self.trace_screen.fill((0, 0, 0, 0))
         self.resize = __import__('pygame').transform.scale
         self.process_state = -1
+        self.scale = scale
+        self.center_point = center_point
+
+    def point_to_pixel(self, point):
+        screen_w, screen_h = self.display.get_size()
+        center_x, center_y = screen_w / 2, screen_h / 2
+        x_abs, y_abs = point
+        center_x_abs, center_y_abs = self.center_point
+        pix_x = center_x + ((x_abs - center_x_abs) * self.scale)
+        pix_y = center_y - ((y_abs - center_y_abs) * self.scale)
+        return (pix_x, pix_y)
+
+    def get_image_size(self, obj_size):
+        obj_w, obj_h = obj_size
+        try_img_w, try_img_h = obj_w * self.scale, obj_h * self.scale
+        img_w, img_h = try_img_w, try_img_h
+
+        max_size = const.MAX_DRAWN_RADIUS * 2
+        min_size = const.MIN_DRAWN_RADIUS * 2
+
+        if (try_img_w > max_size) :
+            img_w = max_size
+            img_h = try_img_h * img_w / try_img_w
+        elif (try_img_w < min_size) :
+            img_w = min_size
+            img_h = try_img_h * img_w / try_img_w
+
+        if (try_img_h > max_size) :
+            img_h = max_size
+            img_w = try_img_w * img_h / try_img_h
+        elif (try_img_h < min_size) :
+            img_h = min_size
+            img_w = try_img_w * img_h / try_img_h
+
+        rescale = img_w / try_img_w
+        obj_w, obj_h = obj_w * rescale, obj_h * rescale
+
+        return ((obj_w, obj_h), (img_w, img_h))
     
-    def redraw(self, screen, scale = 1) -> None:
+    def redraw(self, screen) -> None:
+        self.display.fill((0, 0, 0, 0))
         self.display.blit(self.background, (0,0))
+        self.display.blit(self.trace_screen, (0, 0))
         for obj in self.objects:
             obj_x, obj_y = obj.position
-            obj_w, obj_h = obj.size
-            image_w, image_h = obj_w * scale, obj_h * scale
+            obj_size, image_size = self.get_image_size(obj.size)
+            obj_w, obj_h = obj_size
+            image_w, image_h = image_size
+
             image_scaled = self.resize(obj.image, (image_w, image_h))
 
-            screen_w, screen_h = screen.get_size()
-            center_x, center_y = screen_w / 2, screen_h / 2
-            pix_x = center_x + (obj_x * scale) - (image_w / 2)
-            pix_y = center_y - (obj_y * scale) + (image_h / 2)
+            pix_x, pix_y = self.point_to_pixel(((obj_x - (obj_w / 2)), (obj_y + (obj_h / 2))))
 
             self.display.blit(image_scaled, (pix_x, pix_y))
         screen.blit(self.resize(self.display, screen.get_size()), (0,0))
+
+    def add_trace_segment(self, point1, point2, color_no_alpha):
+        real_color = (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY)
+        
+        radius_vector1 = some_math.coord_to_vect(point1)
+        radius_vector2 = some_math.coord_to_vect(point2)
+        vector = some_math.sum_vectors([some_math.vector_times(radius_vector1, -1), radius_vector2])
+        side_spacing_length = vector[0] * ((1 - const.TRACE_SEGMENT_LENGTH) / 2)
+
+        begin_point = some_math.move_point_by_vector(point1, (side_spacing_length, vector[1]))
+        end_point = some_math.move_point_by_vector(point2, (side_spacing_length, (some_math.vector_times(vector, -1))[1]))
+
+        begin_pix = self.point_to_pixel(begin_point)
+        end_pix = self.point_to_pixel(end_point)
+
+        __import__('pygame').draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)

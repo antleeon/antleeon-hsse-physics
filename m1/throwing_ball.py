@@ -5,26 +5,27 @@ import some_math
 import constants as const
 from time_management import now_milliseconds_since_month as timestamp
 
-def set_objects():
+def set_objects(color_no_alpha = (255, 0, 0)):
     objects = list()
     image = pg.Surface((100, 100), pg.SRCALPHA)
-    pg.draw.circle(image, (255, 0, 0, 255), (50, 50), 50)
+    pg.draw.circle(image, (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY), (50, 50), 50)
     objects.append(Object(image, radius = const.RADIUS,
-                                 position = (const.X_0, 0),
+                                 position = (const.X_0, const.Y_0),
                                  speed = const.SPEED,
-                                 mass = const.MASS))
+                                 mass = const.MASS,
+                                 trace_color = color_no_alpha))
     return objects
 
-def set_background():
-    background = pg.Surface((800, 500))
-    background.fill((255, 255, 255))
+def set_background(screen_size):
+    background = pg.Surface((screen_size), pg.SRCALPHA)
+    background.fill((0, 0, 0, 0))
     return background
 
 def update_function(self, passed_time, motion_type, air_resistance_type):
     def update_motion_curved(obj, acceleration, resistance, time):
         speed = obj.speed
         coordinates = obj.position
-        accel_tang = some_math.projection(acceleration, speed)
+        accel_tang = some_math.projection_codirectional(acceleration, speed)
         accel_norm = some_math.projection(acceleration, some_math.perpendicular(speed))
         air_accel_abs = resistance(obj)
         moving_clockwise = (math.sin(some_math.to_radians(speed[1] - accel_norm[1])) > 0)
@@ -55,7 +56,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
                           'linear': update_motion_linear}
 
     def air_resistance_linear(object):
-        AIR_VISCOSITY = const.ENVIRONMENT_VISCOSITY
+        AIR_VISCOSITY = const.KINEMATIC_VISCOSITY * const.ENVIRONMENT_DENSITY
         
         force_abs = 6 * math.pi * AIR_VISCOSITY * object.radius * abs(object.speed[0])
         acceleration_abs = force_abs / object.mass
@@ -75,7 +76,7 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     air_resistance_dict = {'linear': air_resistance_linear,
                            'quadratic': air_resistance_quadratic}
 
-    MIN_Y_POSITION = -const.HEIGHT
+    MIN_Y_POSITION = const.Y_F
 
     accelerators = [const.GRAVITATIONAL_ACCELERATION]
     acceleration = some_math.sum_vectors(accelerators)
@@ -84,10 +85,16 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
     update_motion = update_motion_dict.get(motion_type, update_motion_linear)
     air_resistance = air_resistance_dict.get(air_resistance_type, air_resistance_linear)
 
+    trace_data = list()
+
     for obj in self.objects:
         if ((obj.position)[1] > MIN_Y_POSITION):
+            last_position = obj.position
             obj.position, obj.speed = update_motion(obj, acceleration, air_resistance, sec_time)
             obj.last_acceleration = acceleration
+            new_position = obj.position
+
+            trace_data.append((last_position, new_position, obj.trace_color))
 
             if (self.process_state == -1):
                 self.process_state = 0
@@ -97,3 +104,20 @@ def update_function(self, passed_time, motion_type, air_resistance_type):
             self.process_state = 1
             self.end_time = timestamp()
 
+    return trace_data
+
+def theory_trace(self):
+    self.begin_time = 0
+    self.end_time = 0
+    self.process_state = 1
+    self.result_printed = True
+
+    calc = __import__('theory_calculations')
+    theory_time = calc.count('linear')[0]
+    trace_points_coordinates = calc.count_trace('linear', theory_time)[0]
+
+    trace_data = list()
+    for i in range(len(trace_points_coordinates) - 1):
+        trace_data.append((trace_points_coordinates[i], trace_points_coordinates[i + 1], (0, 0, 0)))
+    
+    return trace_data
