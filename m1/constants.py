@@ -5,7 +5,7 @@ DRAG_COEFFICIENT = 0.47
 # object
 
 # starting conditions
-SPEED = (3, 60) # meters per second, degrees
+SPEED = (10, 60) # meters per second, degrees
 Y_F = -0.3 # meters (meaning the position of the objects center in relation to its lowest position)
 X_0, Y_0 = 0, 0 # meters (in relation to abstract coordinate center)
 # starting conditions
@@ -32,6 +32,6 @@ MIN_SCREEN_HEIGHT = 500 # pixels
 
 # theoretical calculations settings
 TIME_ACCURACY = 0.0001 # the prcision of time calculation (in seconds)
-TIME_INTERVAL = (0, 10) # the interval, in which the calculations are made (in seconds)
+TIME_INTERVAL = (0, 100) # the interval, in which the calculations are made (in seconds)
 TIME_POINTS_QUANTITY = 100 # the number of time stamps in the calculated interval, for which the further calculation would be made
 # theoretical calculations settings

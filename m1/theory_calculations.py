@@ -30,24 +30,25 @@ def distance_func_linear_resistance(t):
 
 # def distance_func_quadratic_resistance(t): TODO
 
+def binary_find_argument(predicate, accuracy, interval):
+    left, right = interval
+
+    if (predicate(left) == predicate(right)):
+        return right
+    is_right = predicate(right)
+
+    while ((right - left) > accuracy):
+        check = left + ((right - left) / 2)
+        if (predicate(check) == is_right):
+            right = check
+        else:
+            left = check
+
+    return right
+
 distance_funcs_dict = {'linear': distance_func_linear_resistance}
 
 def count(air_resistance_type):
-    def binary_find_argument(predicate, accuracy, interval):
-        left, right = interval
-
-        if (predicate(left) == predicate(right)):
-            return right
-        is_right = predicate(right)
-
-        while ((right - left) > accuracy):
-            check = left + ((right - left) / 2)
-            if (predicate(check) == is_right):
-                right = check
-            else:
-                left = check
-
-        return right
     
     TIME_ACCURACY = const.TIME_ACCURACY
     TIME_INTERVAL = const.TIME_INTERVAL
@@ -98,3 +99,19 @@ def count_trace(air_resistance_type, time):
     boundaries = ((min_x, min_y), (max_x, max_y))
     
     return (coordinates, boundaries)
+
+def auto_height(air_resistance_type):
+    def time_predicate(time):
+        boundaries = (count_trace(air_resistance_type, time))[1]
+        return ((boundaries[1][1] - boundaries[0][1]) > (boundaries[1][0] - boundaries[0][0]))
+
+    least_time = (count(air_resistance_type))[0]
+    max_time = least_time
+
+    while (not time_predicate(max_time)):
+        max_time *= 2
+
+    real_time = binary_find_argument(time_predicate, const.TIME_ACCURACY, (least_time, max_time))
+    height_func = height_funcs_dict.get(air_resistance_type, 'linear')
+    height = height_func(real_time)
+    const.Y_F = height

@@ -51,6 +51,7 @@ def get_screen_settings(boundaries):
     return ((width, height), scale, center_point)
 
 if (__name__ == '__main__'):
+    calc.auto_height('linear') # to be turned on to make better distance/height proportion
     calculated = calc.count('linear')
     output.print_result('Calculated with linear air resistance:', calculated)
     
