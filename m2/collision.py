@@ -7,17 +7,6 @@ import constants as const
 import theory_calculations as calc
 from time_management import now_milliseconds_since_month as timestamp
 
-
-
-def update_motion(obj: Object, passed_time: float) -> None:
-    if (not (obj.movable)):
-        return
-    
-    v = obj.speed
-    pos = obj.position
-    
-    obj.position = sm.move_point_by_vector(pos, sm.vector_times(v, passed_time))
-
 def is_colliding(obj1: Object, obj2: Object) -> bool:
     # here i assume that bricks are never tilted (always standing/laying 90 degrees straight)
     sh1 = obj1.shape
@@ -71,8 +60,30 @@ def is_colliding(obj1: Object, obj2: Object) -> bool:
         return result
     else:
         return False
+    
+def get_collision_direction(obj1: Object, obj2: Object) -> tuple[float, float]:
+    if (obj1.shape == obj2.shape == 'ball'):
+        return sm.vector_from_point_to_point(obj1.position, obj2.position)
+    else:
+        x1_c, y1_c = obj1.position
+        x2_c, y2_c = obj2.position
+        w1, h1 = obj1.size
+        w2, h2 = obj2.size
+        
+        x1_min, y1_min = x1_c - (w1 / 2), y1_c - (h1 / 2)
+        x1_max, y1_max = x1_c + (w1 / 2), y1_c + (h1 / 2)
+        x2_min, y2_min = x2_c - (w2 / 2), y2_c - (h2 / 2)
+        x2_max, y2_max = x2_c + (w2 / 2), y2_c + (h2 / 2)
 
-def count_impulse_debts(objs: list[Object]) -> None:
+        hor_dist = min(abs(x1_min - x2_min), abs(x1_min - x2_max), abs(x1_max - x2_min), abs(x1_max - x2_max))
+        vert_dist = min(abs(y1_min - y2_min), abs(y1_min - y2_max), abs(y1_max - y2_min), abs(y1_max - y2_max))
+
+        if (hor_dist < vert_dist):
+            return sm.vector_to_standard((x2_c - x1_c), 0)
+        else:
+            return sm.vector_to_standard((y2_c - y1_c), 90)
+
+def count_impulse_debts(objs: list[Object]) -> None: # not using this currently
     def group_objects(objects: list[Object]) -> list[set]:
         def unite_groups(gr: list[set], gr_map: list[int], a: int, b: int) -> None:
             idx1 = gr_map[a]
@@ -102,9 +113,7 @@ def count_impulse_debts(objs: list[Object]) -> None:
                 if (i == j):
                     continue
 
-                dist = sm.distance(obj1.position, obj2.position)
-                r_sum = obj1.radius + obj2.radius
-                if (dist < r_sum):
+                if is_colliding(obj1, obj2):
                     unite_groups(groups, groups_map, i, j)
         
         return groups
@@ -115,6 +124,21 @@ def count_impulse_debts(objs: list[Object]) -> None:
         group_mass = sum([objs[i].mass for i in group])
         for i in group:
             objs[i].impulse_debt = sm.sum_vectors([sm.vector_times(objs[i].speed, ((-1) * objs[i].mass)), (imp * objs[i].mass / group_mass)])
+
+def update_motion(obj: Object, passed_time: float) -> None:
+    if (not (obj.movable)):
+        return
+    
+    v = obj.speed
+    pos = obj.position
+    
+    obj.position = sm.move_point_by_vector(pos, sm.vector_times(v, passed_time))
+
+def check_collision(obj1: Object, obj2: Object) -> None:
+    if (not is_colliding(obj1, obj2)):
+        return
+    
+    col_dir = get_collision_direction(obj1, obj2)
 
 def update_speed(obj: Object) -> None:
     v = obj.speed
@@ -144,7 +168,8 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
                           position = (const.X1, const.Y1),
                           speed = speed1,
                           mass = const.MASS1,
-                          trace_color = const.COLOR1)
+                          trace_color = const.COLOR1,
+                          shape = 'ball')
     objects.append(obj1)
     
     image2 = pg.Surface((100, 100), pg.SRCALPHA)
@@ -154,7 +179,8 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
                           position = (const.X2, const.Y2),
                           speed = speed2,
                           mass = const.MASS2,
-                          trace_color = const.COLOR2)
+                          trace_color = const.COLOR2,
+                          shape = 'ball')
     objects.append(obj2)
 
     return objects

@@ -6,7 +6,8 @@ class Object:
     MASS = 1
     TRACE_COLOR = (0, 0, 0)
     IMPULSE_DEBT = (0, 0)
-    SHAPE = 'ball'
+    SHAPE = 'brick'
+    SHAPE_RADIUS = 'ball'
     MOVABLE = True
     # constants
 
@@ -16,10 +17,11 @@ class Object:
         self.position = kwargs.get('position', self.POSITION)
         self.speed = kwargs.get('speed', self.STARTING_SPEED)
         self.mass = kwargs.get('mass', self.MASS)
+        self.shape = kwargs.get('shape', self.SHAPE)
         if ('radius' in kwargs.keys()):
             self.radius = kwargs['radius']
             self.size = (self.radius * 2, self.radius * 2)
+            self.shape = kwargs.get('shape', self.SHAPE_RADIUS)
         self.trace_color = kwargs.get('trace_color', self.TRACE_COLOR)
         self.impulse_debt = kwargs.get('impulse_debt', self.IMPULSE_DEBT)
-        self.shape = kwargs.get('shape', self.SHAPE)
         self.movable = kwargs.get('movable', self.MOVABLE)

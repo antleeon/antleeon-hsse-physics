@@ -33,6 +33,17 @@ def sum_vectors(vectors):
         y += y_shift
     return vector_to_standard(coord_to_vect((x, y)))
 
+def vector_diff(vector1: tuple[float, float], vector2: tuple[float, float]) -> tuple[float, float]:
+    minus_vector2 = vector_times(vector2, -1)
+    result_vector = sum_vectors([vector1, minus_vector2])
+    return result_vector
+
+def vector_from_point_to_point(start_point: tuple[float, float], end_point: tuple[float, float]) -> tuple[float, float]:
+    start_vector = coord_to_vect(start_point)
+    end_vector = coord_to_vect(end_point)
+    result_vector = vector_diff(end_vector, start_vector)
+    return result_vector
+
 def projection(vector, onto):
     _, angle = onto
     or_len, or_ang = vector
