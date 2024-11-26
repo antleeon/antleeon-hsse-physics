@@ -69,3 +69,19 @@ def distance(point1: tuple[float, float], point2: tuple[float, float]) -> float:
     x2, y2 = point2
     dist = (((x1 - x2) ** 2) + ((y1 - y2) ** 2)) ** 0.5
     return dist
+
+def is_inside_circle(point: tuple[float, float], circle: tuple[tuple[float, float], float]) -> bool:
+    center, radius = circle
+    dist = distance(point, center)
+    return (dist < radius)
+
+# TODO: def is_inside_triangle(point: tuple[float, float], triangle: tuple[tuple[float, float], tuple[float, float], tuple[float, float]]) -> bool:
+
+def is_inside_rectangle(point: tuple[float, float], rectangle: tuple[tuple[float, float], tuple[float, float]]) -> bool:
+    x, y = point    
+    center, size = rectangle
+    x_c, y_c = center
+    w, h = size
+    inside_hor = abs(x - x_c) <= (w / 2)
+    inside_vert = abs(y - y_c) <= (h / 2)
+    return (inside_hor and inside_vert)

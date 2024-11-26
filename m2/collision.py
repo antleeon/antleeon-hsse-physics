@@ -7,11 +7,70 @@ import constants as const
 import theory_calculations as calc
 from time_management import now_milliseconds_since_month as timestamp
 
+
+
 def update_motion(obj: Object, passed_time: float) -> None:
+    if (not (obj.movable)):
+        return
+    
     v = obj.speed
     pos = obj.position
     
     obj.position = sm.move_point_by_vector(pos, sm.vector_times(v, passed_time))
+
+def is_colliding(obj1: Object, obj2: Object) -> bool:
+    # here i assume that bricks are never tilted (always standing/laying 90 degrees straight)
+    sh1 = obj1.shape
+    sh2 = obj2.shape
+
+    if (sh1 == sh2 == 'ball'):
+        r_sum = obj1.radius + obj2.radius
+        dist = sm.distance(obj1.position, obj2.position)
+
+        return (dist < r_sum)
+    elif (sh1 == sh2 == 'brick'):
+        w1, h1 = obj1.size
+        w2, h2 = obj2.size
+        x1, y1 = obj1.position
+        x2, y2 = obj2.position
+
+        cross_hor = abs(x1 - x2) <= ((w1 + w2) / 2)
+        cross_vert = abs(y1 - y2) <= ((h1 + h2) / 2)
+
+        return (cross_hor and cross_vert)
+    elif (([sh1, sh2].sort()) == (['ball', 'brick'].sort())):
+        if (sh1 == 'ball'):
+            ball, brick = obj1, obj2
+        else:
+            ball, brick = obj2, obj1
+        
+        brick_center = brick.position
+        w, h = brick.size
+        ball_center = ball.position
+        r = ball.radius
+
+        vert1 = (brick_center[0] - (w / 2), brick_center[1] + (h / 2))
+        vert2 = (brick_center[0] + (w / 2), brick_center[1] + (h / 2))
+        vert3 = (brick_center[0] + (w / 2), brick_center[1] - (h / 2))
+        vert4 = (brick_center[0] - (w / 2), brick_center[1] - (h / 2))
+
+        brick_bubble = {'rect1': (brick_center, (w + 2 * r, h)),
+                        'rect2': (brick_center, (w, h + 2 * r)),
+                        'circle1': (vert1, r),
+                        'circle2': (vert2, r),
+                        'circle3': (vert3, r),
+                        'circle4': (vert4, r)}
+        
+        result = any([sm.is_inside_rectangle(ball_center, brick_bubble['rect1']),
+                      sm.is_inside_rectangle(ball_center, brick_bubble['rect2']),
+                      sm.is_inside_circle(ball_center, brick_bubble['circle1']),
+                      sm.is_inside_circle(ball_center, brick_bubble['circle2']),
+                      sm.is_inside_circle(ball_center, brick_bubble['circle3']),
+                      sm.is_inside_circle(ball_center, brick_bubble['circle4'])])
+
+        return result
+    else:
+        return False
 
 def count_impulse_debts(objs: list[Object]) -> None:
     def group_objects(objects: list[Object]) -> list[set]:
@@ -97,9 +156,6 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
                           mass = const.MASS2,
                           trace_color = const.COLOR2)
     objects.append(obj2)
-
-    for obj in objects:
-        obj.impulse_debt = (0, 0)
 
     return objects
 
