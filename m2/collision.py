@@ -125,33 +125,104 @@ def count_impulse_debts(objs: list[Object]) -> None: # not using this currently
         for i in group:
             objs[i].impulse_debt = sm.sum_vectors([sm.vector_times(objs[i].speed, ((-1) * objs[i].mass)), (imp * objs[i].mass / group_mass)])
 
-def update_motion(obj: Object, passed_time: float) -> None:
+def update_motion(obj: Object, passed_time: float) -> tuple[tuple[float, float], tuple[float, float], tuple[int, int, int]] | None:
     if (not (obj.movable)):
-        return
+        obj.speed = (0, 0)
+        return None
     
     v = obj.speed
     pos = obj.position
-    
-    obj.position = sm.move_point_by_vector(pos, sm.vector_times(v, passed_time))
+    new_pos = sm.move_point_by_vector(pos, sm.vector_times(v, passed_time))
+    obj.position = new_pos
 
-def check_collision(obj1: Object, obj2: Object) -> None:
+    return (pos, new_pos, obj.trace_color)
+
+def check_conservation_collision(obj1: Object, obj2: Object) -> None:
+    # checking if objects could be colliding
     if (not is_colliding(obj1, obj2)):
         return
-    
-    col_dir = get_collision_direction(obj1, obj2)
+    # checking if both objects are movable
+    if (obj1.movable and obj2.movable):
+        # temporary cartesian coordinate axes, where x axis is co-directed with the collision line
+        x_axis = sm.resize_vector(get_collision_direction(obj1, obj2), 1)
+        y_axis = sm.resize_vector(sm.perpendicular(x_axis), 1)
+        # objects' properties (before collision)
+        m1, m2 = obj1.mass, obj2.mass
+        v1_vect, v2_vect = obj1.speed, obj2.speed
+        # projecting speeds onto the axes
+        v1, v2 = v1_vect[0], v2_vect[0]
+        v1_x, v2_x = sm.projection_codirectional(v1_vect, x_axis)[0], sm.projection_codirectional(v2_vect, x_axis)[0]
+        v1_y, v2_y = sm.projection_codirectional(v1_vect, y_axis)[0], sm.projection_codirectional(v2_vect, y_axis)[0]
+        # checking if they're actually moving towards each other
+        v_x_towards = v1_x - v2_x
+        if (v_x_towards <= 0):
+            return
+        # some constants for formulas simplification
+        c1 = (m1 * (v1 ** 2)) + (m2 * (v2 ** 2))
+        c2 = (m1 * v1_x) + (m2 * v2_x)
+        c3 = (m1 * (v1_y ** 2)) + (m2 * (v2_y ** 2))
+        # coefficients of the final quadratic equation & discriminant formula
+        a = (m1 * m2) + (m1 ** 2)
+        b = (-2) * m1 * c2
+        c = (c2 ** 2) - (m2 * c1) + (m2 * c3)
+        D = (b ** 2) - (4 * a * c)
+        # new x axis speeds projections (after collision)
+        v1f_x = (-b + (D ** 0.5)) / (2 * a)
+        v2f_x = (c2 - (m1 * v1f_x)) / m2
+        # back to vectors
+        v1f_x_vect, v2f_x_vect = sm.resize_vector(x_axis, v1f_x), sm.resize_vector(x_axis, v2f_x)
+        v1f_y_vect, v2f_y_vect = sm.resize_vector(y_axis, v1_y), sm.resize_vector(y_axis, v2_y)
+        v1f_vect, v2f_vect = sm.sum_vectors([v1f_x_vect, v1f_y_vect]), sm.sum_vectors([v2f_x_vect, v2f_y_vect])
+        # returning the new speeds to objects
+        obj1.speed, obj2.speed = v1f_vect, v2f_vect
+        obj1.collided, obj2.collided = True, True
+    else:
+        if (obj1.movable):
+            obj_mov, obj_stat = obj1, obj2
+        elif (obj2.movable):
+            obj_mov, obj_stat = obj2, obj1
+        else:
+            return
+        # temporary cartesian coordinate axes, where x axis is co-directed with the collision line
+        x_axis = sm.resize_vector(get_collision_direction(obj_mov, obj_stat), 1)
+        y_axis = sm.resize_vector(sm.perpendicular(x_axis), 1)
+        # speed before collision
+        v_vect = obj_mov.speed
+        # projecting it onto the axes
+        v = v_vect[0]
+        v_x = sm.projection_codirectional(v_vect, x_axis)[0]
+        v_y = sm.projection_codirectional(v_vect, y_axis)[0]
+        # checking if the object is actually moving towards the other
+        if (v_x <= 0):
+            return
+        # new x axis speed projection (after collision)
+        vf_x = -v_x
+        # back to vectors
+        vf_x_vect = sm.resize_vector(x_axis, vf_x)
+        vf_y_vect = sm.resize_vector(y_axis, v_y)
+        vf_vect = sm.sum_vectors([vf_x_vect, vf_y_vect])
+        # returning the new speed to object
+        obj_mov.speed = vf_vect
+        obj_mov.collided, obj_stat.collided = True, False
 
-def update_speed(obj: Object) -> None:
-    v = obj.speed
-    imp_diff = obj.impulse_debt
-    m = obj.mass
+def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:
+    trace_data = list()
+    for obj in self.objects:
+        trace_segment = update_motion(obj, passed_time)
+        if (not (trace_segment is None)):
+            trace_data.append(trace_segment)
+        obj.collided = False
 
-    obj.speed = sm.sum_vectors([v, sm.vector_times(imp_diff, (1 / m))])
-    obj.impulse_debt = (0, 0)
-
-def two_balls_impulse_update(self, passed_time):
+    for i, obj1 in enumerate(self.objects):
+        if obj1.collided:
+            continue
+        for j, obj2 in enumerate(self.objects):
+            if ((i != j) and (not obj1.collided) and (not obj2.collided)):
+                check_conservation_collision(obj1, obj2)
+            if obj1.collided:
+                break
     
-    
-    return list()
+    return trace_data
 
 def set_background(window_size: tuple[int, int]):
     background = pg.Surface((window_size), pg.SRCALPHA)
@@ -185,11 +256,11 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
 
     return objects
 
-def set_process_two_balls_impulse(objects_list: list[Object], process_time: float, draw_scale: float, window_size: tuple[int, int], center: tuple[float, float]) -> Process:
+def set_process_two_balls_conserv(objects_list: list[Object], process_time: float, draw_scale: float, window_size: tuple[int, int], center: tuple[float, float]) -> Process:
     process = Process(objects = objects_list,
                       duration = process_time,
                       scale = draw_scale,
                       background = set_background(window_size),
                       center_point = center,
                       description = 'two balls colliding with constant impulse',
-                      update = two_balls_impulse_update)
+                      update = two_balls_conserv_update_func)

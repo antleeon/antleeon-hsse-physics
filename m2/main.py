@@ -22,26 +22,26 @@ def get_screen_settings(boundaries):
 # auto window sizing
 
 # simulation generators
-def two_balls_impulse_sim_setter() -> Simulation:
+def two_balls_conserv_sim_setter() -> Simulation:
     res = calc.get_speeds_and_time()
     window_size, draw_scale, center_point = get_screen_settings(res['boundaries'])
     simulation_time_scale = res['process time'] / const.OPTIMAL_SIMULATION_TIME
 
     objects = collision.set_objects_two_balls(res['speed1'], res['speed2'])
-    process = collision.set_process_two_balls_impulse(objects, res['process time'], draw_scale, window_size, center_point)
+    process = collision.set_process_two_balls_conserv(objects, res['process time'], draw_scale, window_size, center_point)
     simulation = Simulation([process], time_scale = simulation_time_scale,
                                        window_dimensions = window_size)
 
     return simulation
 
-simulation_setters = {'two balls impulse': two_balls_impulse_sim_setter}
+simulation_setters = {'two balls, conservation': two_balls_conserv_sim_setter}
 
 def set_simulation(option: str) -> Simulation:
-    sim_setter = simulation_setters.get(option, two_balls_impulse_sim_setter)
+    sim_setter = simulation_setters.get(option, two_balls_conserv_sim_setter)
     return sim_setter()
 # simulation generators
 
 if (__name__ == '__main__'):
-    simulation = set_simulation('two balls impulse')
+    simulation = set_simulation('two balls, conservation')
     simulation.run_processes()
     simulation.print_stats()

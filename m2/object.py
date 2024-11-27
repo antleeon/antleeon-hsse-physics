@@ -5,7 +5,6 @@ class Object:
     SIZE = (1, 1)
     MASS = 1
     TRACE_COLOR = (0, 0, 0)
-    IMPULSE_DEBT = (0, 0)
     SHAPE = 'brick'
     SHAPE_RADIUS = 'ball'
     MOVABLE = True
@@ -23,5 +22,4 @@ class Object:
             self.size = (self.radius * 2, self.radius * 2)
             self.shape = kwargs.get('shape', self.SHAPE_RADIUS)
         self.trace_color = kwargs.get('trace_color', self.TRACE_COLOR)
-        self.impulse_debt = kwargs.get('impulse_debt', self.IMPULSE_DEBT)
         self.movable = kwargs.get('movable', self.MOVABLE)

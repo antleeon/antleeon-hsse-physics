@@ -96,3 +96,8 @@ def is_inside_rectangle(point: tuple[float, float], rectangle: tuple[tuple[float
     inside_hor = abs(x - x_c) <= (w / 2)
     inside_vert = abs(y - y_c) <= (h / 2)
     return (inside_hor and inside_vert)
+
+def resize_vector(vector: tuple[float, float], new_length: float) -> tuple[float, float]:
+    length, angle = vector
+    new_vector = vector_to_standard((new_length, angle))
+    return new_vector
