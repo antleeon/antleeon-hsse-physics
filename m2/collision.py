@@ -167,7 +167,7 @@ def check_conservation_collision(obj1: Object, obj2: Object) -> None:
         c = (c2 ** 2) - (m2 * c1) + (m2 * c3)
         D = (b ** 2) - (4 * a * c)
         # new x axis speeds projections (after collision)
-        v1f_x = (-b + (D ** 0.5)) / (2 * a)
+        v1f_x = (-b - (D ** 0.5)) / (2 * a)
         v2f_x = (c2 - (m1 * v1f_x)) / m2
         # back to vectors
         v1f_x_vect, v2f_x_vect = sm.resize_vector(x_axis, v1f_x), sm.resize_vector(x_axis, v2f_x)
@@ -244,7 +244,7 @@ def conserv_update_result_data(result_data: dict | None, objs: list[Object]) -> 
     result_data['last impulse'] = impulse_sum
     result_data['last energy'] = energy_sum
 
-    result_data
+    return result_data
 
 def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:    
     trace_data = list()
@@ -307,3 +307,4 @@ def set_process_two_balls_conserv(objects_list: list[Object], process_time: floa
                       center_point = center,
                       description = 'two balls colliding according to laws of energy and impulse conservation',
                       update = two_balls_conserv_update_func)
+    return process

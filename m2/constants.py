@@ -1,18 +1,19 @@
 # objects
-RADIUS1 = 0.05 # meters
-RADIUS2 = 0.05 # meters
+RADIUS1 = 0.1 # meters
+RADIUS2 = 0.2 # meters
 MASS1 = 0.3 # kilograms
-MASS2 = 0.3 # kilograms
+MASS2 = 0.6 # kilograms
 COLOR1 = (255, 0, 0) # RGB, no alpha
 COLOR2 = (0, 255, 0) # RGB, no alpha
 # objects
 
 # starting conditions
-X1, Y1 = -5, 0 # meters (in relation to abstract coordinate center)
-X2, Y2 = 5, 0 # meters (in relation to abstract coordinate center)
+X1, Y1 = -2, 1 # meters (in relation to abstract coordinate center)
+X2, Y2 = 2, -1 # meters (in relation to abstract coordinate center)
 SPEED1_ABS = 3 # meters per second
 SPEED2_ABS = 3 # meters per second
-COLLISION_ANGLE = 180 # degrees
+COLLISION_ANGLE = 90 # degrees
+ANGLE_APPROXIMATION = 10
 # starting conditions
 
 # technical settings

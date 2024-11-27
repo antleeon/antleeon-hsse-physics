@@ -5,7 +5,7 @@ import constants as const
 
 # auto window sizing
 def get_screen_settings(boundaries):
-    obj_w, obj_h = (2 * const.RADIUS), (2 * const.RADIUS)
+    obj_w, obj_h = (2 * max(const.RADIUS1, const.RADIUS2)), (2 * max(const.RADIUS1, const.RADIUS2))
     max_width, max_height = (const.MAX_SCREEN_WIDTH - (2 * const.SCREEN_PADDING)), (const.MAX_SCREEN_HEIGHT - (2 * const.SCREEN_PADDING))
     min_point, max_point = boundaries
     min_x, min_y = min_point
@@ -44,4 +44,3 @@ def set_simulation(option: str) -> Simulation:
 if (__name__ == '__main__'):
     simulation = set_simulation('two balls, conservation')
     simulation.run_processes()
-    simulation.print_stats()

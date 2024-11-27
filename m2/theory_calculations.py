@@ -23,6 +23,15 @@ def binary_find_argument(predicate, accuracy, interval):
 # two balls collision
 def get_speeds_and_time() -> dict:
     def count_angles_and_collision_time(collision_angle: float, obj1: Object, obj2: Object) -> tuple[tuple[float, float], float]:
+        shift_angle = sm.vector_from_point_to_point(obj1.position, obj2.position)[1]
+        ANGLE_APPROXIMATION = const.ANGLE_APPROXIMATION
+        
+        def check_not_pi(angle: float) -> bool:
+            while (angle < 0):
+                angle += 360
+            angle_round = int(angle)
+            return (((angle_round % 180) > ANGLE_APPROXIMATION) and ((angle_round % 180) < (180 - ANGLE_APPROXIMATION)))
+        
         def max_time(angle1: float) -> float:
             angle2 = 180 - (collision_angle + angle1)
             distance = sm.distance(obj1.position, obj2.position)
@@ -34,13 +43,13 @@ def get_speeds_and_time() -> dict:
             t1_max = dist1 / v1_abs
             t2_max = dist2 / v2_abs
 
-            return min(t1_max, t2_max)
+            return max(t1_max, t2_max)
 
         def approx_time_meet(angle1: float) -> float | None:
-            angle2 = 180 - (collision_angle + angle1)
-            t_max = max_time(angle1)
+            angle2 = (collision_angle + angle1)
+            t_max = 2 * max_time(angle1)
             
-            v1, v2 = (obj1.speed[0], angle1), (obj2.speed[0], angle2)
+            v1, v2 = (obj1.speed[0], shift_angle + angle1), (obj2.speed[0], shift_angle + angle2)
             pos1, pos2 = obj1.position, obj2.position
             r1, r2 = obj1.radius, obj2.radius
             
@@ -58,16 +67,40 @@ def get_speeds_and_time() -> dict:
             t_meet = approx_time_meet(angle1)
             return (not (t_meet is None))
         
-        angle_interval = (-180, 0)
-        angle_accuracy = 0.2
-        angle_predicate = meet_before_cross
+        def find_angle(checker, step, interval) -> float | None:
+            first_fitting = None
+            last_fitting = None
 
-        angle1 = binary_find_argument(angle_predicate, angle_accuracy, angle_interval)
-        angle2 = 180 - (collision_angle + angle1)
+            start = min(interval[0], interval[1])
+            finish = max(interval[0], interval[1])
+            steps_quan = int((finish - start) / step)
 
-        approx_time = approx_time_meet(angle1)
+            for step_numb in range(steps_quan):
+                angle = start + (((finish - start) / steps_quan) * step_numb)
+                if checker(angle):
+                    if (first_fitting is None):
+                        first_fitting = angle
+                    last_fitting = angle
+                else:
+                    if (not (last_fitting is None)):
+                        result = first_fitting + ((last_fitting - first_fitting) / 2)
+                        return result
+            
+            return None
+
+        if check_not_pi(collision_angle):
+            angle_interval = (0, (180 - collision_angle))
+            angle_accuracy = 0.2
+            angle_predicate = meet_before_cross
+
+            angle1 = find_angle(angle_predicate, angle_accuracy, angle_interval)
+            angle2 = (collision_angle + angle1)
+            approx_time = approx_time_meet(angle1)
+        else:
+            angle1, angle2 = 0, 180
+            approx_time = sm.distance(obj1.position, obj2.position) / (obj1.speed[0] + obj2.speed[0])
         
-        return ((angle1, angle2), approx_time)
+        return ((shift_angle + angle1, shift_angle + angle2), approx_time)
     
     def count_boundaries(obj1: Object, obj2: Object, time: float) -> tuple[tuple[float, float], tuple[float, float]]:
         x1, y1 = obj1.position
@@ -95,8 +128,8 @@ def get_speeds_and_time() -> dict:
     SPEED1_ANG, SPEED2_ANG = angles
     process_time = 2 * collision_time
 
-    OBJECT1.speed[1] = SPEED1_ANG
-    OBJECT2.speed[1] = SPEED2_ANG
+    OBJECT1.speed = (OBJECT1.speed[0], SPEED1_ANG)
+    OBJECT2.speed = (OBJECT2.speed[0], SPEED2_ANG)
 
     boundaries = count_boundaries(OBJECT1, OBJECT2, process_time)
 
