@@ -1,4 +1,5 @@
 import output
+import some_math as sm
 from time_management import now_milliseconds_since_month as timestamp
 
 class Simulation:
@@ -30,19 +31,25 @@ class Simulation:
         return (event.type != self.pg.QUIT)
     
     def reset_update_interval(self) -> None:
-        def count_time_interval(object):
-            accel = getattr(object, 'last_acceleration', (0, 0))
-            speed = getattr(object, 'speed', (0, 0))
-            sp_abs = abs(speed[0])
-            ac_abs = abs(accel[0])
-            if not ((sp_abs > 0) and (ac_abs > 0) and (self.approximation > 0)):
+        def count_time_interval(obj1, obj2):
+            v1, v2 = obj1.speed, obj2.speed
+            pos1, pos2 = obj1.position, obj2.position
+            axis = sm.vector_from_point_to_point(pos1, pos2)
+            v1_pr, v2_pr = sm.projection_codirectional(v1, axis)[0], sm.projection_codirectional(v2, axis)[0]
+            v_towards = v1_pr - v2_pr
+            dist = sm.distance(pos1, pos2)
+
+            if not (v_towards > 0):
                 return self.DEFAULT_UPDATE_INTERVAL
-            return (((self.approximation * sp_abs / ac_abs) * 1000) / self.time_scale)
+            return (((dist / v_towards) * 1000) / self.time_scale)
 
         interval = self.DEFAULT_UPDATE_INTERVAL
         for process in self.processes:
-            for object in process.objects:
-                interval = min(count_time_interval(object), interval)
+            for i, object1 in enumerate(process.objects):
+                for j, object2 in enumerate(process.objects):
+                    if (i == j):
+                        continue
+                    interval = min(count_time_interval(object1, object2), interval)
         self.update_interval = max(int(interval), self.MIN_INTERVAL)
 
     def get_subscreen(self):
