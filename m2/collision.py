@@ -205,7 +205,48 @@ def check_conservation_collision(obj1: Object, obj2: Object) -> None:
         obj_mov.speed = vf_vect
         obj_mov.collided, obj_stat.collided = True, False
 
-def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:
+def conserv_update_result_data(result_data: dict | None, objs: list[Object]) -> dict:
+    impulse_sum = (0, 0)
+    energy_sum = 0
+    for obj in objs:
+        v = obj.speed
+        m = obj.mass
+
+        impulse = sm.vector_times(v, m)
+        energy = 0.5 * m * ((v[0]) ** 2)
+
+        impulse_sum = sm.sum_vectors([impulse_sum, impulse])
+        energy_sum = sum([energy_sum, energy])
+
+    if (result_data is None):
+        result_data = dict()
+        
+        result_data['starting impulse'] = impulse_sum
+        result_data['starting energy'] = energy_sum
+
+        result_data['max impulse difference percent'] = 0
+        result_data['max energy difference percent'] = 0
+    else:
+        impulse_start = result_data.get('starting impulse', impulse_sum)
+        impulse_diff = sm.vector_diff(impulse_sum, impulse_start)
+        impulse_diff_percent = int(100 * impulse_diff[0] / impulse_start[0])
+
+        energy_start = result_data.get('starting energy', energy_sum)
+        energy_diff = energy_sum - energy_start
+        energy_diff_percent = int(100 * energy_diff / energy_start)
+
+        max_impulse_diff_percent = result_data.get('max impulse difference percent', impulse_diff_percent)
+        max_energy_diff_percent = result_data.get('max energy difference percent', energy_diff_percent)
+
+        result_data['max impulse difference percent'] = max(impulse_diff_percent, max_impulse_diff_percent)
+        result_data['max energy difference percent'] = max(energy_diff_percent, max_energy_diff_percent)
+
+    result_data['last impulse'] = impulse_sum
+    result_data['last energy'] = energy_sum
+
+    result_data
+
+def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:    
     trace_data = list()
     for obj in self.objects:
         trace_segment = update_motion(obj, passed_time)
@@ -221,6 +262,8 @@ def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:
                 check_conservation_collision(obj1, obj2)
             if obj1.collided:
                 break
+
+    self.result_data = conserv_update_result_data(self.result_data, self.objects)
     
     return trace_data
 
@@ -262,5 +305,5 @@ def set_process_two_balls_conserv(objects_list: list[Object], process_time: floa
                       scale = draw_scale,
                       background = set_background(window_size),
                       center_point = center,
-                      description = 'two balls colliding with constant impulse',
+                      description = 'two balls colliding according to laws of energy and impulse conservation',
                       update = two_balls_conserv_update_func)

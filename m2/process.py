@@ -25,6 +25,7 @@ class Process:
         self.duration = kwargs.get('duration', self.DURATION)
         self.process_state = -1
         self.resize = __import__('pygame').transform.scale
+        self.result_data = None
 
         if (not (self.background is None)):
             self.display = __import__('pygame').Surface(self.background.get_size(), __import__('pygame').SRCALPHA)

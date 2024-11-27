@@ -14,9 +14,10 @@ def print_object(object: Object, message: str = None):
   impulse = object.mass * speed_abs
   print('    impulse:', impulse, 'N*s')
 
-def print_process_result(process_data, message: str = None):
+def print_process_result(process_data: dict, message: str = None):
   if (message):
     print(message)
 
   print('  process:')
-  # something else
+  for key, value in process_data.items():
+    print('    ', key, ': ', value, sep = '')
