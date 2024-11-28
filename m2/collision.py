@@ -293,9 +293,8 @@ def get_rect(color: tuple[int, int, int, int], size: tuple[int, int]):
 def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, float]) -> list[Object]:
     objects = list()
 
-    image1 = pg.Surface((100, 100), pg.SRCALPHA)
     color1 = (const.COLOR1[0], const.COLOR1[1], const.COLOR1[2], const.DRAWING_OPACITY)
-    pg.draw.circle(image1, color1, (50, 50), 50)
+    image1 = get_circle(color1, 50)
     obj1 = Object(image1, radius = const.RADIUS1,
                           position = (const.X1, const.Y1),
                           speed = speed1,
@@ -304,9 +303,8 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
                           shape = 'ball')
     objects.append(obj1)
     
-    image2 = pg.Surface((100, 100), pg.SRCALPHA)
     color2 = (const.COLOR2[0], const.COLOR2[1], const.COLOR2[2], const.DRAWING_OPACITY)
-    pg.draw.circle(image2, color2, (50, 50), 50)
+    image2 = get_circle(color2, 50)
     obj2 = Object(image2, radius = const.RADIUS2,
                           position = (const.X2, const.Y2),
                           speed = speed2,
@@ -320,9 +318,8 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
 def set_objects_one_ball(speed: tuple[float, float]) -> list[Object]:
     objects = list()
 
-    image0 = pg.Surface((100, 100), pg.SRCALPHA)
     color0 = (const.COLOR0[0], const.COLOR0[1], const.COLOR0[2], const.DRAWING_OPACITY)
-    pg.draw.circle(image0, color0, (50, 50), 50)
+    image0 = get_circle(color0, 50)
     obj0 = Object(image0, radius = const.RADIUS0,
                           position = (const.X0, const.Y0),
                           speed = speed,
@@ -331,9 +328,8 @@ def set_objects_one_ball(speed: tuple[float, float]) -> list[Object]:
                           shape = 'ball')
     objects.append(obj0)
     
-    wall_image = pg.Surface((100, 100), pg.SRCALPHA)
     wall_color = (const.WALL_COLOR[0], const.WALL_COLOR[1], const.WALL_COLOR[2], const.DRAWING_OPACITY)
-    pg.draw.rect(wall_image, wall_color, pg.Rect(0, 0, 100, 100))
+    wall_image = get_rect(wall_color, (100, 100))
     wall_obj = Object(wall_image, size = const.WALL_SIZE,
                                   position = (const.WALL_X, const.WALL_Y),
                                   speed = (0, 0),
