@@ -1,3 +1,7 @@
+from object import Object
+from process import Process
+import collision
+
 # objects
 WALL_SIZE = (0.3, 1) # meters x meters (width x height)
 RADIUS0 = 0.1 # meters
@@ -44,3 +48,51 @@ TIME_ACCURACY = 0.0001 # the prcision of time calculation (in seconds)
 TIME_INTERVAL = (0, 100) # the interval, in which the calculations are made (in seconds)
 TIME_POINTS_QUANTITY = 100 # the number of time stamps in the calculated interval, for which the further calculation would be made
 # theoretical calculations settings
+
+# custom manually set process
+CUSTOM_TIME = 0.5 # seconds
+CUSTOM_OBJECTS = [Object(collision.get_circle((255, 0, 0, 255), 50),
+                         trace_color = (255, 0, 0),
+                         radius = 0.1,
+                         position = (0.2, 1),
+                         speed = (4, -115),
+                         mass = 0.3,
+                         shape = 'ball',
+                         movable = True),
+                  Object(collision.get_circle((0, 255, 0, 255), 50),
+                         trace_color = (0, 255, 0),
+                         radius = 0.2,
+                         position = (-0.5, 0.7),
+                         speed = (3.5, -50),
+                         mass = 0.5,
+                         shape = 'ball',
+                         movable = True),
+                  Object(collision.get_circle((0, 0, 255, 255), 50),
+                         trace_color = (0, 0, 255),
+                         radius = 0.15,
+                         position = (-0.6, -0.5),
+                         speed = (5, 20),
+                         mass = 0.4,
+                         shape = 'ball',
+                         movable = True),
+                  Object(collision.get_rect((0, 0, 0, 255), (50, 50)),
+                         trace_color = (0, 0, 0),
+                         size = (0.5, 0.15),
+                         position = (-0.5, -0.1),
+                         speed = (0, 0),
+                         mass = 5,
+                         shape = 'brick',
+                         movable = False),
+                  Object(collision.get_rect((0, 0, 0, 255), (50, 50)),
+                         trace_color = (0, 0, 0),
+                         size = (0.1, 0.7),
+                         position = (0.2, 0),
+                         speed = (0, 0),
+                         mass = 10,
+                         shape = 'brick',
+                         movable = False)]
+CUSTOM_PROCESS = Process(description = 'Custom process',
+                         objects = CUSTOM_OBJECTS,
+                         update = collision.conserv_update_func,
+                         duration = CUSTOM_TIME)
+# custom manually set process

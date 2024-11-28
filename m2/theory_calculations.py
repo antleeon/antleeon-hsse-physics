@@ -20,15 +20,18 @@ def binary_find_argument(predicate, accuracy, interval):
 
     return right
     
-def count_boundaries_simplified(obj1: Object, obj2: Object, time: float) -> tuple[tuple[float, float], tuple[float, float]]:
-    x1, y1 = obj1.position
-    x2, y2 = obj2.position
+def count_boundaries_simplified(objs: list[Object], time: float) -> tuple[tuple[float, float], tuple[float, float]] | None:
+    if (not (len(objs) > 0)):
+        return None
     
-    x3, y3 = sm.move_point_by_vector(obj1.position, sm.vector_times(obj1.speed, time))
-    x4, y4 = sm.move_point_by_vector(obj2.position, sm.vector_times(obj2.speed, time))
+    x_min, y_min = x_max, y_max = objs[0].position
 
-    x_min, y_min = min(x1, x2, x3, x4), min(y1, y2, y3, y4)
-    x_max, y_max = max(x1, x2, x3, x4), max(y1, y2, y3, y4)
+    for obj in objs:
+        x_0, y_0 = obj.position
+        x_f, y_f = sm.move_point_by_vector(obj.position, sm.vector_times(obj.speed, time))
+
+        x_min, y_min = min(x_min, x_0, x_f), min(y_min, y_0, y_f)
+        x_max, y_max = max(x_max, x_0, x_f), max(y_max, y_0, y_f)
 
     return ((x_min, y_min), (x_max, y_max))
 
@@ -131,7 +134,7 @@ def get_speeds_and_time() -> dict:
     OBJECT1.speed = (OBJECT1.speed[0], SPEED1_ANG)
     OBJECT2.speed = (OBJECT2.speed[0], SPEED2_ANG)
 
-    boundaries = count_boundaries_simplified(OBJECT1, OBJECT2, process_time)
+    boundaries = count_boundaries_simplified([OBJECT1, OBJECT2], process_time)
 
     res = dict()
     res['speed1'] = OBJECT1.speed
@@ -214,7 +217,7 @@ def get_speed_and_time() -> dict:
 
     OBJECT0.speed = (OBJECT0.speed[0], SPEED0_ANG)
 
-    boundaries = count_boundaries_simplified(OBJECT0, WALL_OBJECT, process_time)
+    boundaries = count_boundaries_simplified([OBJECT0, WALL_OBJECT], process_time)
 
     res = dict()
     res['speed'] = OBJECT0.speed

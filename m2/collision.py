@@ -280,6 +280,16 @@ def set_background(window_size: tuple[int, int]):
     background.fill((0, 0, 0, 0))
     return background
 
+def get_circle(color: tuple[int, int, int, int], radius: int):
+    image = pg.Surface((2 * radius, 2 * radius), pg.SRCALPHA)
+    pg.draw.circle(image, color, (radius, radius), radius)
+    return image
+
+def get_rect(color: tuple[int, int, int, int], size: tuple[int, int]):
+    image = pg.Surface(size, pg.SRCALPHA)
+    pg.draw.rect(image, color, pg.Rect(0, 0, size[0], size[1]))
+    return image
+
 def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, float]) -> list[Object]:
     objects = list()
 
@@ -353,4 +363,16 @@ def set_process_one_ball_conserv(objects_list: list[Object], process_time: float
                       center_point = center,
                       description = 'one ball hitting a wall according to laws of energy and impulse conservation',
                       update = conserv_update_func)
+    return process
+
+def set_process_custom_conserv(draw_scale: float, window_size: tuple[int, int], center: tuple[float, float]) -> Process:
+    process = const.CUSTOM_PROCESS
+
+    process.scale = draw_scale
+    process.center_point = center
+    process.background = set_background(window_size)
+    process.display = __import__('pygame').Surface(process.background.get_size(), __import__('pygame').SRCALPHA)
+    process.trace_screen = process.display.copy()
+    process.trace_screen.fill((0, 0, 0, 0))
+
     return process
