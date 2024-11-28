@@ -55,7 +55,7 @@ def custom_conserv_sim_setter() -> Simulation:
     template = const.CUSTOM_PROCESS
 
     process_time = template.duration
-    boundaries = calc.count_boundaries_simplified(template.objects, process_time)
+    boundaries = calc.count_boundaries_simplified(template.objects)
     window_size, draw_scale, center_point = get_screen_settings(boundaries)
     simulation_time_scale = process_time / const.OPTIMAL_SIMULATION_TIME
 

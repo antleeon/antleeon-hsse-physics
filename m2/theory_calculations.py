@@ -20,18 +20,29 @@ def binary_find_argument(predicate, accuracy, interval):
 
     return right
     
-def count_boundaries_simplified(objs: list[Object], time: float) -> tuple[tuple[float, float], tuple[float, float]] | None:
+def count_boundaries_simplified(objs: list[Object], time: float = 0) -> tuple[tuple[float, float], tuple[float, float]] | None:
     if (not (len(objs) > 0)):
         return None
     
-    x_min, y_min = x_max, y_max = objs[0].position
+    x_min, y_min = objs[0].position[0] - (objs[0].size[0] / 2), objs[0].position[1] - (objs[0].size[1] / 2)
+    x_max, y_max = objs[0].position[0] + (objs[0].size[0] / 2), objs[0].position[1] + (objs[0].size[1] / 2)
 
     for obj in objs:
         x_0, y_0 = obj.position
         x_f, y_f = sm.move_point_by_vector(obj.position, sm.vector_times(obj.speed, time))
 
-        x_min, y_min = min(x_min, x_0, x_f), min(y_min, y_0, y_f)
-        x_max, y_max = max(x_max, x_0, x_f), max(y_max, y_0, y_f)
+        x_min = min(x_min,
+                    x_0 - (objs[0].size[0] / 2),
+                    x_f - (objs[0].size[0] / 2))
+        y_min = min(y_min,
+                    y_0 - (objs[0].size[1] / 2),
+                    y_f - (objs[0].size[1] / 2))
+        x_max = max(x_max,
+                    x_0 + (objs[0].size[0] / 2),
+                    x_f + (objs[0].size[0] / 2))
+        y_max = max(y_max,
+                    y_0 + (objs[0].size[1] / 2),
+                    y_f + (objs[0].size[1] / 2))
 
     return ((x_min, y_min), (x_max, y_max))
 
