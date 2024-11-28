@@ -229,28 +229,29 @@ def conserv_update_result_data(result_data: dict | None, objs: list[Object]) -> 
     if (result_data is None):
         result_data = dict()
         
-        result_data['starting impulse'] = impulse_sum
-        result_data['starting energy'] = energy_sum
+        result_data['starting impulse'] = (f'{impulse_sum[0]:.2f}', f'{impulse_sum[1]:.2f}')
+        result_data['starting energy'] = f'{energy_sum:.2f}'
 
         result_data['max impulse difference percent'] = 0
         result_data['max energy difference percent'] = 0
     else:
-        impulse_start = result_data.get('starting impulse', impulse_sum)
+        impulse_start_str = result_data.get('starting impulse', impulse_sum)
+        impulse_start = (float(impulse_start_str[0]), float(impulse_start_str[1]))
         impulse_diff = sm.vector_diff(impulse_sum, impulse_start)
-        impulse_diff_percent = int(100 * impulse_diff[0] / impulse_start[0])
+        impulse_diff_percent = 100 * impulse_diff[0] / impulse_start[0]
 
-        energy_start = result_data.get('starting energy', energy_sum)
+        energy_start = float(result_data.get('starting energy', energy_sum))
         energy_diff = energy_sum - energy_start
-        energy_diff_percent = int(100 * energy_diff / energy_start)
+        energy_diff_percent = 100 * energy_diff / energy_start
 
-        max_impulse_diff_percent = result_data.get('max impulse difference percent', impulse_diff_percent)
-        max_energy_diff_percent = result_data.get('max energy difference percent', energy_diff_percent)
+        max_impulse_diff_percent = float(result_data.get('max impulse difference percent', impulse_diff_percent))
+        max_energy_diff_percent = float(result_data.get('max energy difference percent', energy_diff_percent))
 
-        result_data['max impulse difference percent'] = max(impulse_diff_percent, max_impulse_diff_percent)
-        result_data['max energy difference percent'] = max(energy_diff_percent, max_energy_diff_percent)
+        result_data['max impulse difference percent'] = f'{max(impulse_diff_percent, max_impulse_diff_percent):.2f}'
+        result_data['max energy difference percent'] = f'{max(energy_diff_percent, max_energy_diff_percent):.2f}'
 
-    result_data['last impulse'] = impulse_sum
-    result_data['last energy'] = energy_sum
+    result_data['last impulse'] = (f'{impulse_sum[0]:.2f}', f'{impulse_sum[1]:.2f}')
+    result_data['last energy'] = f'{energy_sum:.2f}'
 
     return result_data
 

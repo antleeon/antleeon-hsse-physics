@@ -6,13 +6,13 @@ def print_object(object: Object, message: str = None):
 
   print('  object:')
   x, y = object.position
-  print('    coordinates:', x, 'm (hor),', y, 'm (vert)')
+  print('    coordinates:', f'{x:.2f}', 'm (hor),', f'{y:.2f}', 'm (vert)')
   speed_abs, speed_ang = object.speed
-  print('    speed:', speed_abs, 'm/s', 'at', speed_ang, 'degrees')
+  print('    speed:', f'{speed_abs:.2f}', 'm/s', 'at', f'{speed_ang:.2f}', 'degrees')
   kinetic_energy = 0.5 * object.mass * (speed_abs ** 2)
-  print('    kinetic energy:', kinetic_energy, 'J')
+  print('    kinetic energy:', f'{kinetic_energy:.2f}', 'J')
   impulse = object.mass * speed_abs
-  print('    impulse:', impulse, 'N*s')
+  print('    impulse:', f'{impulse:.2f}', 'N*s')
 
 def print_process_result(process_data: dict, message: str = None):
   if (message):
