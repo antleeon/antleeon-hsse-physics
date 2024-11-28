@@ -1,6 +1,6 @@
 class Object:
     # constants
-    STARTING_SPEED = (10, 0)
+    STARTING_SPEED = (0, 0)
     POSITION = (0, 0)
     SIZE = (1, 1)
     MASS = 1

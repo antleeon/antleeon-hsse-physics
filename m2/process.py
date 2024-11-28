@@ -104,4 +104,5 @@ class Process:
 
     def describe(self) -> None:
         for i, object in enumerate(self.objects):
-            output.print_object(object, f"Object #{i + 1}:")
+            if (object.movable):
+                output.print_object(object, f"Object #{i + 1}:")

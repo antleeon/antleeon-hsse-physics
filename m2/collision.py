@@ -16,7 +16,9 @@ def is_colliding(obj1: Object, obj2: Object) -> bool:
         r_sum = obj1.radius + obj2.radius
         dist = sm.distance(obj1.position, obj2.position)
 
-        return (dist < r_sum)
+        result = (dist < r_sum)
+
+        return result
     elif (sh1 == sh2 == 'brick'):
         w1, h1 = obj1.size
         w2, h2 = obj2.size
@@ -75,13 +77,19 @@ def get_collision_direction(obj1: Object, obj2: Object) -> tuple[float, float]:
         x2_min, y2_min = x2_c - (w2 / 2), y2_c - (h2 / 2)
         x2_max, y2_max = x2_c + (w2 / 2), y2_c + (h2 / 2)
 
-        hor_dist = min(abs(x1_min - x2_min), abs(x1_min - x2_max), abs(x1_max - x2_min), abs(x1_max - x2_max))
-        vert_dist = min(abs(y1_min - y2_min), abs(y1_min - y2_max), abs(y1_max - y2_min), abs(y1_max - y2_max))
+        hor_dist = min(abs(abs(x1_min - x2_min) - (w1 + w2)),
+                       abs(abs(x1_min - x2_max) - (w1 + w2)),
+                       abs(abs(x1_max - x2_min) - (w1 + w2)),
+                       abs(abs(x1_max - x2_max) - (w1 + w2))) / (w1 + w2)
+        vert_dist = min(abs(abs(y1_min - y2_min) - (h1 + h2)),
+                        abs(abs(y1_min - y2_max) - (h1 + h2)),
+                        abs(abs(y1_max - y2_min) - (h1 + h2)),
+                        abs(abs(y1_max - y2_max) - (h1 + h2))) / (h1 + h2)
 
         if (hor_dist < vert_dist):
-            return sm.vector_to_standard((x2_c - x1_c), 0)
+            return sm.vector_to_standard(((x2_c - x1_c), 0))
         else:
-            return sm.vector_to_standard((y2_c - y1_c), 90)
+            return sm.vector_to_standard(((y2_c - y1_c), 90))
 
 def count_impulse_debts(objs: list[Object]) -> None: # not using this currently
     def group_objects(objects: list[Object]) -> list[set]:
@@ -246,7 +254,7 @@ def conserv_update_result_data(result_data: dict | None, objs: list[Object]) -> 
 
     return result_data
 
-def two_balls_conserv_update_func(self: Process, passed_time: float) -> list:    
+def conserv_update_func(self: Process, passed_time: float) -> list:    
     trace_data = list()
     for obj in self.objects:
         trace_segment = update_motion(obj, passed_time)
@@ -299,6 +307,34 @@ def set_objects_two_balls(speed1: tuple[float, float], speed2: tuple[float, floa
 
     return objects
 
+def set_objects_one_ball(speed: tuple[float, float]) -> list[Object]:
+    objects = list()
+
+    image0 = pg.Surface((100, 100), pg.SRCALPHA)
+    color0 = (const.COLOR0[0], const.COLOR0[1], const.COLOR0[2], const.DRAWING_OPACITY)
+    pg.draw.circle(image0, color0, (50, 50), 50)
+    obj0 = Object(image0, radius = const.RADIUS0,
+                          position = (const.X0, const.Y0),
+                          speed = speed,
+                          mass = const.MASS0,
+                          trace_color = const.COLOR0,
+                          shape = 'ball')
+    objects.append(obj0)
+    
+    wall_image = pg.Surface((100, 100), pg.SRCALPHA)
+    wall_color = (const.WALL_COLOR[0], const.WALL_COLOR[1], const.WALL_COLOR[2], const.DRAWING_OPACITY)
+    pg.draw.rect(wall_image, wall_color, pg.Rect(0, 0, 100, 100))
+    wall_obj = Object(wall_image, size = const.WALL_SIZE,
+                                  position = (const.WALL_X, const.WALL_Y),
+                                  speed = (0, 0),
+                                  mass = const.WALL_MASS,
+                                  trace_color = const.WALL_COLOR,
+                                  shape = 'brick',
+                                  movable = False)
+    objects.append(wall_obj)
+
+    return objects
+
 def set_process_two_balls_conserv(objects_list: list[Object], process_time: float, draw_scale: float, window_size: tuple[int, int], center: tuple[float, float]) -> Process:
     process = Process(objects = objects_list,
                       duration = process_time,
@@ -306,5 +342,15 @@ def set_process_two_balls_conserv(objects_list: list[Object], process_time: floa
                       background = set_background(window_size),
                       center_point = center,
                       description = 'two balls colliding according to laws of energy and impulse conservation',
-                      update = two_balls_conserv_update_func)
+                      update = conserv_update_func)
+    return process
+
+def set_process_one_ball_conserv(objects_list: list[Object], process_time: float, draw_scale: float, window_size: tuple[int, int], center: tuple[float, float]) -> Process:
+    process = Process(objects = objects_list,
+                      duration = process_time,
+                      scale = draw_scale,
+                      background = set_background(window_size),
+                      center_point = center,
+                      description = 'one ball hitting a wall according to laws of energy and impulse conservation',
+                      update = conserv_update_func)
     return process

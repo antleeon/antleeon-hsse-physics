@@ -19,6 +19,18 @@ def binary_find_argument(predicate, accuracy, interval):
             left = check
 
     return right
+    
+def count_boundaries_simplified(obj1: Object, obj2: Object, time: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    x1, y1 = obj1.position
+    x2, y2 = obj2.position
+    
+    x3, y3 = sm.move_point_by_vector(obj1.position, sm.vector_times(obj1.speed, time))
+    x4, y4 = sm.move_point_by_vector(obj2.position, sm.vector_times(obj2.speed, time))
+
+    x_min, y_min = min(x1, x2, x3, x4), min(y1, y2, y3, y4)
+    x_max, y_max = max(x1, x2, x3, x4), max(y1, y2, y3, y4)
+
+    return ((x_min, y_min), (x_max, y_max))
 
 # two balls collision
 def get_speeds_and_time() -> dict:
@@ -101,28 +113,16 @@ def get_speeds_and_time() -> dict:
             approx_time = sm.distance(obj1.position, obj2.position) / (obj1.speed[0] + obj2.speed[0])
         
         return ((shift_angle + angle1, shift_angle + angle2), approx_time)
-    
-    def count_boundaries(obj1: Object, obj2: Object, time: float) -> tuple[tuple[float, float], tuple[float, float]]:
-        x1, y1 = obj1.position
-        x2, y2 = obj2.position
-        
-        x3, y3 = sm.move_point_by_vector(obj1.position, sm.vector_times(obj1.speed, time))
-        x4, y4 = sm.move_point_by_vector(obj2.position, sm.vector_times(obj2.speed, time))
-
-        x_min, y_min = min(x1, x2, x3, x4), min(y1, y2, y3, y4)
-        x_max, y_max = max(x1, x2, x3, x4), max(y1, y2, y3, y4)
-
-        return ((x_min, y_min), (x_max, y_max))
 
     OBJECT1 = Object(None, radius = const.RADIUS1,
-                        mass = const.MASS1,
-                        position = (const.X1, const.Y1),
-                        speed = (const.SPEED1_ABS, None))
+                           mass = const.MASS1,
+                           position = (const.X1, const.Y1),
+                           speed = (const.SPEED1_ABS, None))
 
     OBJECT2 = Object(None, radius = const.RADIUS2,
-                        mass = const.MASS2,
-                        position = (const.X2, const.Y2),
-                        speed = (const.SPEED2_ABS, None))
+                           mass = const.MASS2,
+                           position = (const.X2, const.Y2),
+                           speed = (const.SPEED2_ABS, None))
 
     angles, collision_time = count_angles_and_collision_time(const.COLLISION_ANGLE, OBJECT1, OBJECT2)
     SPEED1_ANG, SPEED2_ANG = angles
@@ -131,11 +131,93 @@ def get_speeds_and_time() -> dict:
     OBJECT1.speed = (OBJECT1.speed[0], SPEED1_ANG)
     OBJECT2.speed = (OBJECT2.speed[0], SPEED2_ANG)
 
-    boundaries = count_boundaries(OBJECT1, OBJECT2, process_time)
+    boundaries = count_boundaries_simplified(OBJECT1, OBJECT2, process_time)
 
     res = dict()
     res['speed1'] = OBJECT1.speed
     res['speed2'] = OBJECT2.speed
+    res['process time'] = process_time
+    res['boundaries'] = boundaries
+
+    return res
+
+# one ball hitting a wall
+def get_speed_and_time() -> dict:
+    def count_angle_and_collision_time(obj: Object, wall: Object) -> tuple[float, float]:
+        concentric_vector = sm.vector_from_point_to_point(obj.position, wall.position)
+
+        def is_point_inside_wall(shift_part: float) -> bool:
+            start_point = obj.position
+            shift_vector = sm.vector_times(concentric_vector, shift_part)
+            point = sm.move_point_by_vector(start_point, shift_vector)
+            wall_center = wall.position
+            wall_size = wall.size
+            result = sm.is_inside_rectangle(point, (wall_center, wall_size))
+            return result
+        
+        vector_length_part_interval = (0, 1)
+        vector_length_part_predicate = is_point_inside_wall
+        vector_lenght_part_accuracy = 0.001
+
+        vector_length_part = binary_find_argument(vector_length_part_predicate, vector_lenght_part_accuracy, vector_length_part_interval)
+        to_border_shift_vector = sm.vector_times(concentric_vector, vector_length_part)
+        border_point = sm.move_point_by_vector(obj.position, to_border_shift_vector)
+
+        def find_border_center_point(point: tuple[float, float]) -> bool:
+            x, y = point
+            x_c, y_c = wall.position
+            w, h = wall.size
+            x_l, y_l = x_c - (w / 2), y_c
+            x_r, y_r = x_c + (w / 2), y_c
+            x_t, y_t = x_c, y_c + (h / 2)
+            x_b, y_b = x_c, y_c - (h / 2)
+            hor_from_border = min(abs(x - x_l), abs(x - x_r)) / (w / 2)
+            vert_from_border =  min(abs(y - y_t), abs(y - y_b)) / (h / 2)
+            vertical_border = (hor_from_border < vert_from_border)
+            if vertical_border:
+                y = y_c
+            else:
+                x = x_c
+            return ((x, y), vertical_border)
+        
+        border_center_point, border_is_vertical = find_border_center_point(border_point)
+        radius = obj.radius
+        concentric_angle = concentric_vector[1]
+        if border_is_vertical:
+            move_right = int(m.cos(sm.to_radians(concentric_angle)) > 0) - int(m.cos(sm.to_radians(concentric_angle)) < 0)
+            shift_back = (radius, 90 + (90 * move_right))
+        else:
+            move_up = int(m.sin(sm.to_radians(concentric_angle)) > 0) - int(m.sin(sm.to_radians(concentric_angle)) < 0)
+            shift_back = (radius, 0 - (90 * move_up))
+
+        ball_collision_center_point = sm.move_point_by_vector(border_center_point, shift_back)
+        tragectory_vector = sm.vector_from_point_to_point(obj.position, ball_collision_center_point)
+
+        angle = tragectory_vector[1]
+        collision_time = tragectory_vector[0] / (obj.speed[0])
+
+        return (angle, collision_time)
+
+    OBJECT0 = Object(None, radius = const.RADIUS0,
+                           mass = const.MASS0,
+                           position = (const.X0, const.Y0),
+                           speed = (const.SPEED0_ABS, None))
+    
+    WALL_OBJECT = Object(None, size = const.WALL_SIZE,
+                               mass = const.WALL_MASS,
+                               position = (const.WALL_X, const.WALL_Y),
+                               speed = (0, 0),
+                               movable = False)
+    
+    SPEED0_ANG, collision_time = count_angle_and_collision_time(OBJECT0, WALL_OBJECT)
+    process_time = 2 * collision_time
+
+    OBJECT0.speed = (OBJECT0.speed[0], SPEED0_ANG)
+
+    boundaries = count_boundaries_simplified(OBJECT0, WALL_OBJECT, process_time)
+
+    res = dict()
+    res['speed'] = OBJECT0.speed
     res['process time'] = process_time
     res['boundaries'] = boundaries
 
