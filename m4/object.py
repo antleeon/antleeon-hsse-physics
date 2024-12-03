@@ -6,8 +6,8 @@ class Object:
     SIZE = (1, 1)
     MASS = 1
     TRACE_COLOR = (0, 0, 0)
-    SHAPE = 'brick'
-    SHAPE_RADIUS = 'ball'
+    SHAPE = 'parallelogram'
+    SHAPE_RADIUS = 'sphere'
     MOVABLE = True
     # constants
 

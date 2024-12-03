@@ -1,7 +1,18 @@
 # object
-RADIUS = 0.05 # meters
-MASS = 0.3 # kilograms
-DRAG_COEFFICIENT = 0.47 # depends on the shape
+OBJECTS = {
+  'ball': {
+    'shape': 'sphere', # 3D shape
+    'drag coefficient': 0.47, # depends on the shape
+    'radius': 0.05, # meters
+    'mass': 0.3 # kilograms
+  },
+  'brick': {
+    'shape': 'parallelogram', # 3D shape
+    'drag coefficient': 1.05, # depends on the shape
+    'size': (0.1, 0.13), # meters * meters
+    'mass': 0.4 # kilograms
+  }
+}
 THREAD_LENGTH = 0.7 # meters
 # object
 
@@ -35,7 +46,7 @@ ENVIRONMENT_CONDITIONS = {
 DRAWING_OPACITY = 255 # color opacity as an alpha channel value in RGBA format
 TRACE_SEGMENT_LENGTH = 0.6 # length of stroke length in relation to whole segment's length when grawing trace (between 0 and 1)
 TRACE_LINE_WIDTH = 3 # width of the trace line in pixels
-OPTIMAL_SIMULATION_TIME = 5 # seconds
+OPTIMAL_SIMULATION_TIME = 2 # seconds
 SCREEN_PADDING = 30 # pixels
 MIN_DRAWN_RADIUS = 10 # pixels
 MAX_DRAWN_RADIUS = 100 # pixels

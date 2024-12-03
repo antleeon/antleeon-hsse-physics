@@ -21,8 +21,8 @@ def get_screen_settings(boundaries):
 # auto window sizing
 
 # simulation generators
-def earth_air_sim_setter() -> Simulation:
-    res = calc.count()
+def set_simulation(environment_option: str, object_option: str) -> Simulation:
+    res = calc.count(environment_option, object_option)
     boundaries = res['boundaries']
     period = res['period']
     attachment = res['attachment']
@@ -31,32 +31,19 @@ def earth_air_sim_setter() -> Simulation:
     window_size, draw_scale, center_point = get_screen_settings(boundaries)
     simulation_time_scale = period / const.OPTIMAL_SIMULATION_TIME
 
-    object = pendulum.set_object_ball(speed)
-    process = pendulum.set_process_earth_air([object], draw_scale, window_size, center_point, attachment)
+    object = pendulum.set_object(object_option, speed)
+    process = pendulum.set_process([object], draw_scale, window_size, center_point, attachment)
     simulation = Simulation([process], time_scale = simulation_time_scale,
                                        window_dimensions = window_size)
 
     return simulation
-
-def earth_water_sim_setter():
-    return
-
-def mars_atmosphere_sim_setter():
-    return
 # simulation generators
-
-simulation_setters = {'Earth, air': earth_air_sim_setter,
-                      'Earth, water': earth_water_sim_setter,
-                      'Mars, atmosphere': mars_atmosphere_sim_setter}
-
-def set_simulation(option: str) -> Simulation:
-    sim_setter = simulation_setters.get(option, earth_air_sim_setter)
-    return sim_setter()
 
 if (__name__ == '__main__'):
     # choose option:
-    simulation = set_simulation('Earth, air')
-    #simulation = set_simulation('Earth, water')
-    #simulation = set_simulation('Mars, atmosphere')
+    simulation = set_simulation('Earth, air', 'ball')
+    #simulation = set_simulation('Earth, air', 'brick')
+    #simulation = set_simulation('Earth, water', 'ball')
+    #simulation = set_simulation('Mars, atmosphere', 'ball')
     
     simulation.run_processes()
