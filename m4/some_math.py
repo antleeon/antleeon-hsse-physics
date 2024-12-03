@@ -33,6 +33,17 @@ def sum_vectors(vectors):
         y += y_shift
     return vector_to_standard(coord_to_vect((x, y)))
 
+def vector_diff(vector1: tuple[float, float], vector2: tuple[float, float]) -> tuple[float, float]:
+    minus_vector2 = vector_times(vector2, -1)
+    result_vector = sum_vectors([vector1, minus_vector2])
+    return result_vector
+
+def vector_from_point_to_point(start_point: tuple[float, float], end_point: tuple[float, float]) -> tuple[float, float]:
+    start_vector = coord_to_vect(start_point)
+    end_vector = coord_to_vect(end_point)
+    result_vector = vector_diff(end_vector, start_vector)
+    return result_vector
+
 def projection(vector, onto):
     _, angle = onto
     or_len, or_ang = vector
@@ -63,3 +74,30 @@ def vector_times(vector, scalar):
 
 def circle_length(radius):
     return (2 * radius * math.pi)
+
+def distance(point1: tuple[float, float], point2: tuple[float, float]) -> float:
+    x1, y1 = point1
+    x2, y2 = point2
+    dist = (((x1 - x2) ** 2) + ((y1 - y2) ** 2)) ** 0.5
+    return dist
+
+def is_inside_circle(point: tuple[float, float], circle: tuple[tuple[float, float], float]) -> bool:
+    center, radius = circle
+    dist = distance(point, center)
+    return (dist < radius)
+
+# TODO: def is_inside_triangle(point: tuple[float, float], triangle: tuple[tuple[float, float], tuple[float, float], tuple[float, float]]) -> bool:
+
+def is_inside_rectangle(point: tuple[float, float], rectangle: tuple[tuple[float, float], tuple[float, float]]) -> bool:
+    x, y = point    
+    center, size = rectangle
+    x_c, y_c = center
+    w, h = size
+    inside_hor = abs(x - x_c) <= (w / 2)
+    inside_vert = abs(y - y_c) <= (h / 2)
+    return (inside_hor and inside_vert)
+
+def resize_vector(vector: tuple[float, float], new_length: float) -> tuple[float, float]:
+    length, angle = vector
+    new_vector = vector_to_standard((new_length, angle))
+    return new_vector

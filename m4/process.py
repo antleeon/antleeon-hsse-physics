@@ -1,19 +1,38 @@
+
 import constants as const
 import some_math
+import output
 
 class Process:
-    def __init__(self, objects, update, background, center_point = (0, 0), scale = 1, info = '') -> None:
-        self.info = info
-        self.objects = objects
-        self.update = __import__('types').MethodType(update, self)
-        self.background = background
-        self.display = __import__('pygame').Surface(background.get_size(), __import__('pygame').SRCALPHA)
-        self.trace_screen = self.display.copy()
-        self.trace_screen.fill((0, 0, 0, 0))
-        self.resize = __import__('pygame').transform.scale
+
+    # default values
+    def UPDATE(self):
+        return
+    
+    CENTER_POINT = (0, 0)
+    SCALE = 1
+    OBJECTS = list()
+    BACKGROUND = None
+    DESCRIPTION = None
+    DURATION = None
+    # default values
+
+    def __init__(self, **kwargs) -> None:
+        self.description = kwargs.get('description', self.DESCRIPTION)
+        self.objects = kwargs.get('objects', self.OBJECTS)
+        self.update = __import__('types').MethodType(kwargs.get('update', self.UPDATE), self)
+        self.background = kwargs.get('background', self.BACKGROUND)
+        self.scale = kwargs.get('scale', self.SCALE)
+        self.center_point = kwargs.get('center_point', self.CENTER_POINT)
+        self.duration = kwargs.get('duration', self.DURATION)
         self.process_state = -1
-        self.scale = scale
-        self.center_point = center_point
+        self.resize = __import__('pygame').transform.scale
+        self.result_data = None
+
+        if (not (self.background is None)):
+            self.display = __import__('pygame').Surface(self.background.get_size(), __import__('pygame').SRCALPHA)
+            self.trace_screen = self.display.copy()
+            self.trace_screen.fill((0, 0, 0, 0))
 
     def point_to_pixel(self, point):
         screen_w, screen_h = self.display.get_size()
@@ -83,3 +102,8 @@ class Process:
         end_pix = self.point_to_pixel(end_point)
 
         __import__('pygame').draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)
+
+    def describe(self) -> None:
+        for i, object in enumerate(self.objects):
+            if (object.movable):
+                output.print_object(object, f"Object #{i + 1}:")
