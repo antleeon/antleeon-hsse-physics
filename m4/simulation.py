@@ -33,27 +33,19 @@ class Simulation:
         return (event.type != self.pg.QUIT)
     
     def reset_update_interval(self) -> None:
-        def count_time_interval(obj1, obj2):
-            v1, v2 = obj1.speed, obj2.speed
-            pos1, pos2 = obj1.position, obj2.position
-            axis = sm.vector_from_point_to_point(pos1, pos2)
-            v1_pr, v2_pr = sm.projection_codirectional(v1, axis)[0], sm.projection_codirectional(v2, axis)[0]
-            v_towards = v1_pr - v2_pr
-            size1, size2 = obj1.size, obj2.size
-            dim1, dim2 = ((size1[0] ** 2) + (size1[1] ** 2)) ** 0.5, ((size2[0] ** 2) + (size2[1] ** 2)) ** 0.5
-            dist = max(sm.distance(pos1, pos2) - (dim1 + dim2), 0)
-
-            if not (v_towards > 0):
+        def count_time_interval(object):
+            accel = getattr(object, 'last_acceleration', (0, 0))
+            speed = getattr(object, 'speed', (0, 0))
+            sp_abs = abs(speed[0])
+            ac_abs = abs(accel[0])
+            if not ((sp_abs > 0) and (ac_abs > 0) and (self.approximation > 0)):
                 return self.DEFAULT_UPDATE_INTERVAL
-            return ((((dist / v_towards) * self.FRAMING_STEP) * 1000) / self.time_scale)
+            return (((self.approximation * sp_abs / ac_abs) * 1000) / self.time_scale)
 
         interval = self.DEFAULT_UPDATE_INTERVAL
         for process in self.processes:
-            for i, object1 in enumerate(process.objects):
-                for j, object2 in enumerate(process.objects):
-                    if (i == j):
-                        continue
-                    interval = min(count_time_interval(object1, object2), interval)
+            for object in process.objects:
+                interval = min(count_time_interval(object), interval)
         self.update_interval = max(int(interval), self.MIN_INTERVAL)
 
     def get_subscreen(self):
@@ -87,22 +79,11 @@ class Simulation:
                 time_passed = update_time - process.last_updated
                 trace_data = process.update(time_passed * self.time_scale / 1000)
                 process.last_updated = update_time
-
                 if (process.process_state == -1):
                     process.begin_time = update_time
                     process.process_state = 0
-                elif ((process.process_state == 0) and (((update_time - process.begin_time) * self.time_scale / 1000) >= process.duration)):
-                    process.end_time = update_time
-                    process.process_state = 1
-
                 for segment in trace_data:
                     process.add_trace_segment(segment[0], segment[1], segment[2])
-            elif (not process.result_printed):
-                description = process.description
-                result_data = process.result_data
-                output.print_process_result(result_data, f'Got with settings "{description}":')
-                process.result_printed = True
-                process.describe()
             curr_subscreen = subscreen.copy()
             process.redraw(curr_subscreen)
             self.screen.blit(curr_subscreen, self.get_subscreen_position(i))

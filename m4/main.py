@@ -32,7 +32,7 @@ def set_simulation(environment_option: str, object_option: str) -> Simulation:
     simulation_time_scale = period / const.OPTIMAL_SIMULATION_TIME
 
     object = pendulum.set_object(object_option, speed)
-    process = pendulum.set_process([object], draw_scale, window_size, center_point, attachment)
+    process = pendulum.set_process(environment_option, [object], draw_scale, window_size, center_point, attachment)
     simulation = Simulation([process], time_scale = simulation_time_scale,
                                        window_dimensions = window_size)
 
