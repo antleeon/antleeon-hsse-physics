@@ -23,16 +23,20 @@ def get_screen_settings(boundaries):
 # simulation generators
 def set_simulation(environment_option: str, object_option: str) -> Simulation:
     res = calc.count(environment_option, object_option)
+    
     boundaries = res['boundaries']
     period = res['period']
     attachment = res['attachment']
     speed = res['speed']
+    max_speed_abs = res['maximum speed module']
+    amplitude = res['amplitude']
     
     window_size, draw_scale, center_point = get_screen_settings(boundaries)
     simulation_time_scale = period / const.OPTIMAL_SIMULATION_TIME
+    process_info = f"Process information:\n  period: {period} s\n  maximum speed: {max_speed_abs} m/s\n  amplitude: {amplitude} m"
 
     object = pendulum.set_object(object_option, speed)
-    process = pendulum.set_process(environment_option, [object], draw_scale, window_size, center_point, attachment)
+    process = pendulum.set_process(environment_option, [object], draw_scale, window_size, center_point, attachment, process_info)
     simulation = Simulation([process], time_scale = simulation_time_scale,
                                        window_dimensions = window_size)
 

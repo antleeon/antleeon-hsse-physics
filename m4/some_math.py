@@ -33,6 +33,10 @@ def sum_vectors(vectors):
         y += y_shift
     return vector_to_standard(coord_to_vect((x, y)))
 
+def vector_sum(vector1: tuple[float, float], vector2: tuple[float, float]) -> tuple[float, float]:
+    result_vector = sum_vectors([vector1, vector2])
+    return result_vector
+
 def vector_diff(vector1: tuple[float, float], vector2: tuple[float, float]) -> tuple[float, float]:
     minus_vector2 = vector_times(vector2, -1)
     result_vector = sum_vectors([vector1, minus_vector2])
