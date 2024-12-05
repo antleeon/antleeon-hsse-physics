@@ -13,6 +13,36 @@ def get_update_func(environment_option: str) -> function:
     with_resist = c.WITH_ENVIRONMENTAL_RESISTANCE
 
     def update_func(self: Process, passed_time: float) -> list:
+        def check_amplitude(obj: Object) -> None:
+            def is_left_amplitude() -> bool:
+                center = obj.attachment_point
+                x_c, y_c = center
+                posits = obj.positions
+                pos_bef, pos, pos_aft = posits[-3][0], posits[-2][0], posits[-1][0]
+                x_b, y_b = pos_bef
+                x, y = pos
+                x_a, y_a = pos_aft
+                res = ((x_c - x) > 0) & ((x_b - x) > 0) & ((x_a - x) > 0)
+                return res
+            
+            if is_left_amplitude():
+                amp = obj.positions[-2]
+                amp_pos, amp_time = amp
+                center = obj.attachment_point
+                amp_pos_ang = sm.vector_from_point_to_point(center, amp_pos)[1]
+                zero_pos_ang = grav_accel[1]
+                amp_ang = abs(zero_pos_ang - amp_pos_ang) % 360
+                radius = obj.thread_length
+                circle_len = 2 * m.pi * radius
+                amplitude = circle_len * amp_ang / 360
+                last_time = obj.last_amplitude_time
+                if (not (last_time is None)):
+                    period = amp_time - last_time
+                    print('amplitude: {amplitude:.2f} m, period: {period:.2f} s')
+                else:
+                    print('amplitude: {amplitude:.2f} m')
+                obj.last_amplitude_time = amp_time
+        
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient
             speed = obj.speed
