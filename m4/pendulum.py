@@ -13,7 +13,7 @@ def get_update_func(environment_option: str) -> function:
     with_resist = c.WITH_ENVIRONMENTAL_RESISTANCE
 
     def update_func(self: Process, passed_time: float) -> list:
-        def resistance_accel(obj: Object) -> float: # quadratic
+        def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient
             speed = obj.speed
             mass = obj.mass
@@ -23,7 +23,17 @@ def get_update_func(environment_option: str) -> function:
             accel_abs = force_abs / mass
             accel_ang = speed[1] + 180
             
-            return sm.vector_to_standard((accel_abs, accel_ang))            
+            return sm.vector_to_standard((accel_abs, accel_ang))
+        
+        def archimedes_accel(obj: Object) -> tuple[float, float]:
+            mass = obj.mass
+            volume = obj.volume()
+
+            force_abs = env_dens * volume * grav_accel[0]
+            accel_abs = force_abs / mass
+            accel_ang = grav_accel[1] + 180
+
+            return sm.vector_to_standard((accel_abs, accel_ang))
 
         def update_motion(obj: Object) -> None:
             resist_accel = resistance_accel(obj) if with_resist else (0, 0)
