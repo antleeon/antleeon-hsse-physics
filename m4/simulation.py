@@ -78,7 +78,6 @@ class Simulation:
                 if (process.process_state == -1):
                     process.begin_time = update_time
                     process.process_state = 0
-                    print(process.description)
                 time_passed = update_time - process.last_updated
                 trace_data = process.update(time_passed * self.time_scale / 1000)
                 process.last_updated = update_time

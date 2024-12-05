@@ -42,7 +42,7 @@ def count(environment_option: str, object_option: str) -> dict:
         return (360 / angular_velocity)
 
     def count_period() -> float:
-        def count_self_accel() -> float[float, float]:
+        def count_self_accel() -> tuple[float, float]:
             def count_volume() -> float:
                 object = const.OBJECTS[object_option]
                 shape = object['shape']
@@ -73,9 +73,9 @@ def count(environment_option: str, object_option: str) -> dict:
         gravitational_acceleration = const.ENVIRONMENT_CONDITIONS[environment_option]['gravitational acceleration']
         self_acceleration = count_self_accel()
         acceleration = sm.vector_sum(gravitational_acceleration, self_acceleration)
-        vert_accel = sm.projection_codirectional(acceleration, (1, 90))
+        vert_accel = sm.projection_codirectional(acceleration, (1, -90))
         accel_abs = vert_accel[0]
-        period = 2 * m.pi * ((len / accel_abs) ** 0.5)
+        period = 2 * m.pi * m.sqrt(len / accel_abs)
 
         return period
     
@@ -89,7 +89,7 @@ def count(environment_option: str, object_option: str) -> dict:
         x, y = const.X, const.Y
         curr_h = y - y_lowest
         energy_pot = m * g[0] * curr_h
-        energy_kin = 0.5 * m (speed[0] ** 2)
+        energy_kin = 0.5 * m * (speed[0] ** 2)
         energy = energy_pot + energy_kin
         max_speed_abs = (2 * energy / m) ** 0.5
 

@@ -1,13 +1,14 @@
 import constants as c
 import math as m
 import some_math as sm
+import pygame as pg
 from object import Object
 from process import Process
 
-def get_update_func(environment_option: str) -> function:
+def get_update_func(environment_option: str):
     environment = c.ENVIRONMENT_CONDITIONS[environment_option]
     env_dens = environment['density']
-    grav_accel = environment['gravity acceleration']
+    grav_accel = environment['gravitational acceleration']
     kin_vesc = environment['kinematic viscosity']
     env_visc = kin_vesc * env_dens
     with_resist = c.WITH_ENVIRONMENTAL_RESISTANCE
@@ -38,9 +39,9 @@ def get_update_func(environment_option: str) -> function:
                 last_time = obj.last_amplitude_time
                 if (not (last_time is None)):
                     period = amp_time - last_time
-                    print('amplitude: {amplitude:.2f} m, period: {period:.2f} s')
+                    print(f'amplitude: {amplitude:.2f} m, period: {period:.2f} s')
                 else:
-                    print('amplitude: {amplitude:.2f} m')
+                    print(f'amplitude: {amplitude:.2f} m')
                 obj.last_amplitude_time = amp_time
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
@@ -100,6 +101,7 @@ def get_update_func(environment_option: str) -> function:
             new_pos = sm.move_point_by_vector(pos, from_center_new)
             last_time = obj.positions[-1][1]
             curr_time = last_time + passed_time
+            obj.position = new_pos
             obj.positions.append((new_pos, curr_time))
             obj.positions = obj.positions[1:]
             obj.tilt_angle = -(from_center_new[1] + 90)
@@ -122,6 +124,64 @@ def get_update_func(environment_option: str) -> function:
             trace_data.append((last_position, new_position, obj.trace_color))
 
         return trace_data
-
     
     return update_func
+
+def set_background(window_size: tuple[int, int]):
+    background = pg.Surface((window_size), pg.SRCALPHA)
+    background.fill((0, 0, 0, 0))
+    return background
+
+def get_circle(color: tuple[int, int, int, int], radius: int):
+    image = pg.Surface((2 * radius, 2 * radius), pg.SRCALPHA)
+    pg.draw.circle(image, color, (radius, radius), radius)
+    return image
+
+def get_rect(color: tuple[int, int, int, int], size: tuple[int, int]):
+    image = pg.Surface(size, pg.SRCALPHA)
+    pg.draw.rect(image, color, pg.Rect(0, 0, size[0], size[1]))
+    return image
+
+def set_object(object_option: str, speed: tuple[float, float], attachment: tuple[float, float]) -> Object:
+    parameters = c.OBJECTS[object_option]
+
+    shape = parameters['shape']
+    drag_coefficient = parameters['drag coefficient']
+    mass = parameters['mass']
+    color_no_alpha = parameters['color']
+    color = (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], c.DRAWING_OPACITY)
+    thread_length = c.THREAD_LENGTH
+    position = c.X, c.Y
+    if (shape == 'parallelogram'):
+        radius = None
+        size = parameters['size']
+        image = get_rect(color, (100, 100))
+    elif (shape == 'sphere'):
+        radius = parameters['radius']
+        size = (2 * radius, 2 * radius)
+        image = get_circle(color, 50)
+    else:
+        radius, size, image = None, None, None
+    
+    obj = Object(image, radius = radius,
+                        size = size,
+                        position = position,
+                        speed = speed,
+                        attachment_point = attachment,
+                        shape = shape,
+                        mass = mass,
+                        trace_color = color_no_alpha,
+                        drag_coefficient = drag_coefficient,
+                        thread_length = thread_length,
+                        movable = True)
+    
+    return obj
+
+def set_process(environment_option: str, objects: list[Object], scale: float, window_size: tuple[int, int], center_point: tuple[float, float], process_info: str) -> Process:
+    process = Process(objects = objects,
+                      scale = scale,
+                      background = set_background(window_size),
+                      center_point = center_point,
+                      description = process_info,
+                      update = get_update_func(environment_option))
+    return process

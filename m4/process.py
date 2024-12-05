@@ -1,4 +1,3 @@
-
 import constants as const
 import some_math
 
@@ -94,7 +93,7 @@ class Process:
 
             __import__('pygame').draw.line(self.display, thr_col, (pix_x, pix_y), attach_pix, thr_line_w)
             self.display.blit(image_tilted, (pix_x, pix_y))
-        screen.blit(self.resize(self.display, screen.get_size()), (0,0))
+        screen.blit(self.transform.scale(self.display, screen.get_size()), (0,0))
 
     def add_trace_segment(self, point1, point2, color_no_alpha):
         real_color = (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY)
@@ -111,3 +110,6 @@ class Process:
         end_pix = self.point_to_pixel(end_point)
 
         __import__('pygame').draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)
+
+    def describe(self) -> None:
+        print(self.description)

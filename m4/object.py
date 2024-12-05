@@ -23,6 +23,7 @@ class Object: # at this point i sould've probably done class inheritance
         self.image = image
         self.size = kwargs.get('size', self.SIZE)
         position = kwargs.get('position', self.POSITION)
+        self.position = position
         self.positions = [(position, 0), (position, 0), (position, 0)]
         self.speed = kwargs.get('speed', self.STARTING_SPEED)
         self.mass = kwargs.get('mass', self.MASS)
