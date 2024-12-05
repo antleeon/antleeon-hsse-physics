@@ -63,8 +63,12 @@ def get_update_func(environment_option: str) -> function:
             obj.positions.append((new_pos, curr_time))
             obj.positions = obj.positions[1:]
 
-            # блять ещё скорость считать
-
+            a_real = 2 * (shift - (v * t)) / (t ** 2)
+            v_new = v + (a_real * t)
+            ang_new = from_center_new[1] - (90 * angle_coeff)
+            speed_new = sm.vector_to_standard((v_new, ang_new))
+            obj.speed = speed_new
+            obj.last_acceleration = sm.vector_to_standard((a_real, ang_new))
         
         trace_data = list()
         
