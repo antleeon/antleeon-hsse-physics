@@ -1,4 +1,3 @@
-import output
 import some_math as sm
 import constants as const
 from time_management import now_milliseconds_since_month as timestamp
@@ -76,12 +75,13 @@ class Simulation:
         for i, process in enumerate(self.processes):
             if (process.process_state != 1):
                 update_time = timestamp()
-                time_passed = update_time - process.last_updated
-                trace_data = process.update(time_passed * self.time_scale / 1000)
-                process.last_updated = update_time
                 if (process.process_state == -1):
                     process.begin_time = update_time
                     process.process_state = 0
+                    print(process.description)
+                time_passed = update_time - process.last_updated
+                trace_data = process.update(time_passed * self.time_scale / 1000)
+                process.last_updated = update_time
                 for segment in trace_data:
                     process.add_trace_segment(segment[0], segment[1], segment[2])
             curr_subscreen = subscreen.copy()

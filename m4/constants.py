@@ -4,16 +4,19 @@ OBJECTS = {
     'shape': 'sphere', # 3D shape
     'drag coefficient': 0.47, # depends on the shape
     'radius': 0.05, # meters
-    'mass': 0.3 # kilograms
+    'mass': 0.3, # kilograms
+    'color': (255, 0, 0) # RGB color
   },
   'brick': {
     'shape': 'parallelogram', # 3D shape
     'drag coefficient': 1.05, # depends on the shape
     'size': (0.1, 0.13), # meters * meters
-    'mass': 0.4 # kilograms
+    'mass': 0.4, # kilograms
+    'color': (0, 255, 0) # RGB color
   }
 }
 THREAD_LENGTH = 0.7 # meters
+THREAD_COLOR = (100, 100, 0) # RGB color
 # object
 
 # starting conditions
@@ -40,6 +43,7 @@ ENVIRONMENT_CONDITIONS = {
     'gravitational acceleration': (3.7, -90)
   }
 }
+WITH_ENVIRONMENTAL_RESISTANCE = True
 # environment conditions
 
 # technical settings

@@ -1,7 +1,6 @@
 
 import constants as const
 import some_math
-import output
 
 class Process:
 
@@ -102,8 +101,3 @@ class Process:
         end_pix = self.point_to_pixel(end_point)
 
         __import__('pygame').draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)
-
-    def describe(self) -> None:
-        for i, object in enumerate(self.objects):
-            if (object.movable):
-                output.print_object(object, f"Object #{i + 1}:")
