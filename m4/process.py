@@ -78,13 +78,21 @@ class Process:
             obj_size, image_size = self.get_image_size(obj.size)
             obj_w, obj_h = obj_size
             tilt_angle = obj.tilt_angle
+            attachment = obj.attachment_point
             image_w, image_h = image_size
 
             image_scaled = self.transform.scale(obj.image, (image_w, image_h))
             image_tilted = self.transform.rotate(image_scaled, tilt_angle)
 
             pix_x, pix_y = self.point_to_pixel(((obj_x - (obj_w / 2)), (obj_y + (obj_h / 2))))
+            attach_pix = self.point_to_pixel(attachment)
+            
+            thr_col_no_alpha = const.THREAD_COLOR
+            thr_col_opacity = const.DRAWING_OPACITY
+            thr_col = (thr_col_no_alpha[0], thr_col_no_alpha[1], thr_col_no_alpha[2], thr_col_opacity)
+            thr_line_w = const.THREAD_LINE_WIDTH
 
+            __import__('pygame').draw.line(self.display, thr_col, (pix_x, pix_y), attach_pix, thr_line_w)
             self.display.blit(image_tilted, (pix_x, pix_y))
         screen.blit(self.resize(self.display, screen.get_size()), (0,0))
 

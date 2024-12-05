@@ -17,6 +17,7 @@ OBJECTS = {
 }
 THREAD_LENGTH = 0.7 # meters
 THREAD_COLOR = (100, 100, 0) # RGB color
+THREAD_LINE_WIDTH = 4 # pixels
 # object
 
 # starting conditions
