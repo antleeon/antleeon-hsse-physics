@@ -1,6 +1,6 @@
 import math as m
 
-class Object:
+class Object: # at this point i sould've probably done class inheritance
     # constants
     STARTING_SPEED = (0, 0)
     POSITION = (0, 0)
@@ -16,6 +16,7 @@ class Object:
     LAST_AMPLITUDE_TIME = None
     ATTACHMENT_POINT = None
     THREAD_LENGTH = 0
+    TILT_ANGLE = 0
     # constants
 
     def __init__(self, image, **kwargs) -> None:
@@ -38,6 +39,7 @@ class Object:
         self.last_amplitude_time = kwargs.get('last_amplitude_time', self.LAST_AMPLITUDE_TIME)
         self.attachment_point = kwargs.get('attachment_point', self.ATTACHMENT_POINT)
         self.thread_length = kwargs.get('thread_length', self.THREAD_LENGTH)
+        self.tilt_angle = kwargs.get('tilt_angle', self.TILT_ANGLE)
 
     def reference_area(self) -> float:
         if (self.shape == 'parallelogram'):

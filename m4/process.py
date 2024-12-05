@@ -25,7 +25,7 @@ class Process:
         self.center_point = kwargs.get('center_point', self.CENTER_POINT)
         self.duration = kwargs.get('duration', self.DURATION)
         self.process_state = -1
-        self.resize = __import__('pygame').transform.scale
+        self.transform = __import__('pygame').transform
         self.result_data = None
 
         if (not (self.background is None)):
@@ -71,19 +71,21 @@ class Process:
     
     def redraw(self, screen) -> None:
         self.display.fill((0, 0, 0, 0))
-        self.display.blit(self.background, (0,0))
+        self.display.blit(self.background, (0, 0))
         self.display.blit(self.trace_screen, (0, 0))
         for obj in self.objects:
             obj_x, obj_y = obj.position
             obj_size, image_size = self.get_image_size(obj.size)
             obj_w, obj_h = obj_size
+            tilt_angle = obj.tilt_angle
             image_w, image_h = image_size
 
-            image_scaled = self.resize(obj.image, (image_w, image_h))
+            image_scaled = self.transform.scale(obj.image, (image_w, image_h))
+            image_tilted = self.transform.rotate(image_scaled, tilt_angle)
 
             pix_x, pix_y = self.point_to_pixel(((obj_x - (obj_w / 2)), (obj_y + (obj_h / 2))))
 
-            self.display.blit(image_scaled, (pix_x, pix_y))
+            self.display.blit(image_tilted, (pix_x, pix_y))
         screen.blit(self.resize(self.display, screen.get_size()), (0,0))
 
     def add_trace_segment(self, point1, point2, color_no_alpha):

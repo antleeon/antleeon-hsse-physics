@@ -102,6 +102,7 @@ def get_update_func(environment_option: str) -> function:
             curr_time = last_time + passed_time
             obj.positions.append((new_pos, curr_time))
             obj.positions = obj.positions[1:]
+            obj.tilt_angle = -(from_center_new[1] + 90)
 
             a_real = 2 * (shift - (v * t)) / (t ** 2)
             v_new = v + (a_real * t)
