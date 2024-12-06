@@ -105,6 +105,12 @@ def get_update_func(environment_option: str):
 
             new_speed = sm.vector_sum(mid_speed, resist_diff_proj)
 
+            v_0, v_d = speed[0], -(resist_diff_proj[0])
+            g = pot_accel[0]
+            h_0, h_f = pos[1], new_pos[1]
+            v_f = m.sqrt(abs((2 * g * (h_0 - h_f)) + (v_0 ** 2)))
+            new_speed = ((v_f + v_d), new_speed[1])
+
             last_time = obj.positions[-1][1]
             curr_time = last_time + t
             obj.position = new_pos
