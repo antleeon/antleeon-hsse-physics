@@ -13,6 +13,13 @@ OBJECTS = {
     'size': (0.1, 0.13), # meters * meters
     'mass': 0.5, # kilograms
     'color': (0, 200, 50) # RGB color
+  },
+  'baloon': {
+    'shape': 'sphere', # 3D shape
+    'drag coefficient': 0.47, # depends on the shape
+    'radius': 0.1, # meters
+    'mass': 0.005, # kilograms
+    'color': (255, 100, 200) # RGB color
   }
 }
 THREAD_LENGTH = 0.7 # meters
@@ -21,7 +28,7 @@ THREAD_LINE_WIDTH = 4 # pixels
 # object
 
 # starting conditions
-ANGULAR_VELOCITY = 100 # degrees per second
+ANGULAR_VELOCITY = 150 # degrees per second
 ANGLE = 30 # degrees (starting position)
 X, Y = 0, 0 # meters (in relation to abstract coordinate center)
 # starting conditions
@@ -44,13 +51,14 @@ ENVIRONMENT_CONDITIONS = {
     'gravitational acceleration': (3.7, -90)
   }
 }
-WITH_ENVIRONMENTAL_RESISTANCE = False
+WITH_ENVIRONMENTAL_RESISTANCE = True
 WITH_ARCHIMEDES_FORCE = True
 # environment conditions
 
 # technical settings
 DRAWING_OPACITY = 255 # color opacity as an alpha channel value in RGBA format
-TRACE_SEGMENT_LENGTH = 0.6 # length of stroke length in relation to whole segment's length when grawing trace (between 0 and 1)
+FADE_OPACITY = 2 # RGB alpha channel value for trace overpaint (e.i. speed of its fading out)
+TRACE_SEGMENT_LENGTH = 0.1 # length of stroke length in relation to whole segment's length when grawing trace (between 0 and 1)
 TRACE_LINE_WIDTH = 3 # width of the trace line in pixels
 OPTIMAL_SIMULATION_TIME = 3 # seconds
 SCREEN_PADDING = 30 # pixels

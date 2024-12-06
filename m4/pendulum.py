@@ -70,8 +70,7 @@ def get_update_func(environment_option: str):
             arch_accel = archimedes_accel(obj) if c.WITH_ARCHIMEDES_FORCE else (0, 0)
             resist_accel = resistance_accel(obj) if c.WITH_ENVIRONMENTAL_RESISTANCE else (0, 0)
 
-            pot_accel = sm.vector_sum(grav_accel, arch_accel)
-            sum_accel = sm.vector_sum(pot_accel, resist_accel)
+            sum_accel = sm.sum_vectors([grav_accel, arch_accel, resist_accel])
 
             pos = obj.position
             center = obj.attachment_point
@@ -82,7 +81,6 @@ def get_update_func(environment_option: str):
             new_pos_free = sm.move_point_by_vector(pos,
                                                    sm.vector_sum(sm.vector_times(speed, t),
                                                                  sm.vector_times(sum_accel, (t ** 2) / 2)))
-            speed_diff_free = sm.vector_times(sum_accel, t)
             
             radius_vector_old = sm.vector_from_point_to_point(center, pos)
             radius_vector_free = sm.vector_from_point_to_point(center, new_pos_free)
@@ -91,8 +89,21 @@ def get_update_func(environment_option: str):
             new_pos = sm.move_point_by_vector(center, radius_vector_new)
             
             speed_turned = (speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1]))
-            speed_diff_proj = sm.projection(speed_diff_free, sm.vector_from_point_to_point(pos, new_pos))
-            new_speed = sm.vector_sum(speed_turned, speed_diff_proj)
+            movement_axis = (1, sm.vector_from_point_to_point(pos, new_pos)[1])
+            
+            pot_accel = sm.vector_sum(grav_accel, arch_accel)
+            resist_accel_turned = (resist_accel[0], resist_accel[1] + (movement_axis[1] - speed[1]))
+
+            pot_speed_diff = sm.vector_times(pot_accel, t)
+            resist_speed_diff = sm.vector_times(resist_accel_turned, t)
+
+            pot_diff_proj = sm.projection(pot_speed_diff, movement_axis)
+            mid_speed = sm.vector_sum(speed_turned, pot_diff_proj)
+
+            max_resist_diff_proj = sm.vector_times(sm.projection(mid_speed, movement_axis), (-1))
+            resist_diff_proj = resist_speed_diff if (max_resist_diff_proj[0] >= resist_speed_diff[0]) else max_resist_diff_proj
+
+            new_speed = sm.vector_sum(mid_speed, resist_diff_proj)
 
             last_time = obj.positions[-1][1]
             curr_time = last_time + t

@@ -114,7 +114,11 @@ class Process:
         begin_pix = self.point_to_pixel(begin_point)
         end_pix = self.point_to_pixel(end_point)
 
-        __import__('pygame').draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)
+        pg = __import__('pygame')
+        curtain = pg.Surface(self.trace_screen.get_size(), pg.SRCALPHA)
+        curtain.fill((255, 255, 255, const.FADE_OPACITY))
+        self.trace_screen.blit(curtain, (0, 0))
+        pg.draw.line(self.trace_screen, real_color, begin_pix, end_pix, const.TRACE_LINE_WIDTH)
 
     def describe(self) -> None:
         print(self.description)
