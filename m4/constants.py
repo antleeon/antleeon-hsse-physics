@@ -44,7 +44,7 @@ ENVIRONMENT_CONDITIONS = {
     'gravitational acceleration': (3.7, -90)
   }
 }
-WITH_ENVIRONMENTAL_RESISTANCE = True
+WITH_ENVIRONMENTAL_RESISTANCE = False
 WITH_ARCHIMEDES_FORCE = True
 # environment conditions
 

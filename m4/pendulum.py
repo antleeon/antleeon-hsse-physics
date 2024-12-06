@@ -82,27 +82,17 @@ def get_update_func(environment_option: str):
             new_pos_free = sm.move_point_by_vector(pos,
                                                    sm.vector_sum(sm.vector_times(speed, t),
                                                                  sm.vector_times(sum_accel, (t ** 2) / 2)))
-            new_speed_free = sm.vector_sum(speed,
-                                           sm.vector_times(sum_accel, t))
+            speed_diff_free = sm.vector_times(sum_accel, t)
             
             radius_vector_old = sm.vector_from_point_to_point(center, pos)
             radius_vector_free = sm.vector_from_point_to_point(center, new_pos_free)
             radius_vector_new = (radius, radius_vector_free[1])
 
             new_pos = sm.move_point_by_vector(center, radius_vector_new)
-            new_speed_0 = (new_speed_free[0], new_speed_free[1] + (radius_vector_new[1] - radius_vector_old[1]))
-
-            new_speed_1 = sm.vector_sum((speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1])),
-                                        sm.vector_times(sum_accel, t))
             
-            new_speed_2 = sm.vector_diff(new_speed_1,
-                                         sm.projection(sm.vector_times(sum_accel, t),
-                                                       sm.perpendicular(speed)))
-            
-            new_speed_3 = sm.projection(new_speed_1,
-                                        (speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1])))
-            
-            new_speed = new_speed_3
+            speed_turned = (speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1]))
+            speed_diff_proj = sm.projection(speed_diff_free, sm.vector_from_point_to_point(pos, new_pos))
+            new_speed = sm.vector_sum(speed_turned, speed_diff_proj)
 
             last_time = obj.positions[-1][1]
             curr_time = last_time + t
