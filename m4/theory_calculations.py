@@ -16,7 +16,7 @@ def count(environment_option: str, object_option: str) -> dict:
         trajectory_radius = const.THREAD_LENGTH
         speed_size = (angular_velocity / 360) * trajectory_radius # not speed_abs, as it's signed (where negative is opposite direction)
         thread_angle = const.ANGLE
-        speed_angle = thread_angle + 90
+        speed_angle = thread_angle + 180
         speed = (speed_size, speed_angle)
         return sm.vector_to_standard(speed)
     
@@ -25,6 +25,14 @@ def count(environment_option: str, object_option: str) -> dict:
         speed = count_speed()
         speed_abs = speed[0]
         mass = const.OBJECTS[object_option]['mass']
+        shape = const.OBJECTS[object_option]['shape']
+        if (shape == 'sphere'):
+            radius = const.OBJECTS[object_option]['radius']
+            size = (radius * 2, radius * 2)
+            w, h = size
+        elif (shape == 'parallelogram'):
+            size = const.OBJECTS[object_option]['size']
+            w, h = size
         kinetic_energy = 0.5 * mass * (speed_abs ** 2)
         g = const.ENVIRONMENT_CONDITIONS[environment_option]['gravitational acceleration']
         thread_angle = const.ANGLE
@@ -33,8 +41,8 @@ def count(environment_option: str, object_option: str) -> dict:
         max_possible_uprise = thread_len * (1 + cos)
         max_uprise = max(kinetic_energy / (mass * g[0]), max_possible_uprise)
         x_c, y_c = count_attachment_point()
-        min_x, max_x = x_c - thread_len, x_c + thread_len
-        min_y, max_y = y_c - thread_len, y + max_uprise
+        min_x, max_x = x_c - (thread_len + w), x_c + (thread_len + w)
+        min_y, max_y = y_c - (thread_len + h), y + (max_uprise + h)
         return ((min_x, min_y), (max_x, max_y))
     
     def count_period_very_approximately() -> float:
@@ -75,7 +83,7 @@ def count(environment_option: str, object_option: str) -> dict:
         acceleration = sm.vector_sum(gravitational_acceleration, self_acceleration)
         vert_accel = sm.projection_codirectional(acceleration, (1, -90))
         accel_abs = vert_accel[0]
-        period = 2 * m.pi * m.sqrt(len / accel_abs)
+        period = 2 * m.pi * m.sqrt(abs(len / accel_abs))
 
         return period
     

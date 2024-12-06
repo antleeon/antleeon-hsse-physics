@@ -11,8 +11,8 @@ OBJECTS = {
     'shape': 'parallelogram', # 3D shape
     'drag coefficient': 1.05, # depends on the shape
     'size': (0.1, 0.13), # meters * meters
-    'mass': 0.4, # kilograms
-    'color': (0, 255, 0) # RGB color
+    'mass': 0.5, # kilograms
+    'color': (0, 200, 50) # RGB color
   }
 }
 THREAD_LENGTH = 0.7 # meters
@@ -21,7 +21,7 @@ THREAD_LINE_WIDTH = 4 # pixels
 # object
 
 # starting conditions
-ANGULAR_VELOCITY = 10 # degrees per second
+ANGULAR_VELOCITY = 100 # degrees per second
 ANGLE = 30 # degrees (starting position)
 X, Y = 0, 0 # meters (in relation to abstract coordinate center)
 # starting conditions
@@ -45,6 +45,7 @@ ENVIRONMENT_CONDITIONS = {
   }
 }
 WITH_ENVIRONMENTAL_RESISTANCE = True
+WITH_ARCHIMEDES_FORCE = True
 # environment conditions
 
 # technical settings

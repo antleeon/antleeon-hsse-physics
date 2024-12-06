@@ -1,5 +1,6 @@
 import constants as const
 import some_math
+import math
 
 class Process:
 
@@ -83,17 +84,21 @@ class Process:
             image_scaled = self.transform.scale(obj.image, (image_w, image_h))
             image_tilted = self.transform.rotate(image_scaled, tilt_angle)
 
-            pix_x, pix_y = self.point_to_pixel(((obj_x - (obj_w / 2)), (obj_y + (obj_h / 2))))
-            attach_pix = self.point_to_pixel(attachment)
+            sin, cos = abs(math.sin(some_math.to_radians(tilt_angle))), abs(math.cos(some_math.to_radians(tilt_angle)))
+            new_w, new_h = (obj_w * cos) + (obj_h * sin), (obj_h * cos) + (obj_w * sin)
+
+            pix_x, pix_y = self.point_to_pixel(((obj_x - (new_w / 2)), (obj_y + (new_h / 2))))
+            attach_cent_pix = self.point_to_pixel(attachment)
+            attach_obj_pix = self.point_to_pixel((obj_x, obj_y))
             
             thr_col_no_alpha = const.THREAD_COLOR
             thr_col_opacity = const.DRAWING_OPACITY
             thr_col = (thr_col_no_alpha[0], thr_col_no_alpha[1], thr_col_no_alpha[2], thr_col_opacity)
             thr_line_w = const.THREAD_LINE_WIDTH
 
-            __import__('pygame').draw.line(self.display, thr_col, (pix_x, pix_y), attach_pix, thr_line_w)
+            __import__('pygame').draw.line(self.display, thr_col, attach_obj_pix, attach_cent_pix, thr_line_w)
             self.display.blit(image_tilted, (pix_x, pix_y))
-        screen.blit(self.transform.scale(self.display, screen.get_size()), (0,0))
+        screen.blit(self.transform.scale(self.display, screen.get_size()), (0, 0))
 
     def add_trace_segment(self, point1, point2, color_no_alpha):
         real_color = (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], const.DRAWING_OPACITY)

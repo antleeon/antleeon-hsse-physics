@@ -11,7 +11,7 @@ class Simulation:
     MIN_INTERVAL = 5
     TIME_SCALE = 0.2
 
-    APPROXIMATION = 0.001
+    APPROXIMATION = 0.0000001
     FRAMING_STEP = 0.05
 
     SIMULATION_NAME = 'Simulation'

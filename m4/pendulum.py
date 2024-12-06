@@ -67,51 +67,50 @@ def get_update_func(environment_option: str):
             return sm.vector_to_standard((accel_abs, accel_ang))
 
         def update_motion(obj: Object) -> None:
-            resist_accel = resistance_accel(obj) if with_resist else (0, 0)
-            arch_accel = archimedes_accel(obj)
-            min_accel = sm.vector_sum(grav_accel, arch_accel)
+            arch_accel = archimedes_accel(obj) if c.WITH_ARCHIMEDES_FORCE else (0, 0)
+            resist_accel = resistance_accel(obj) if c.WITH_ENVIRONMENTAL_RESISTANCE else (0, 0)
 
-            speed = sm.vector_to_standard(obj.speed)
-            speed_proj = speed[0]
-            min_accel_proj = sm.projection_codirectional(min_accel, speed)[0]
-            resist_accel_proj = sm.projection_codirectional(resist_accel, speed)[0]
+            pot_accel = sm.vector_sum(grav_accel, arch_accel)
+            sum_accel = sm.vector_sum(pot_accel, resist_accel)
 
-            t = passed_time
-            v = speed_proj
-            a0 = min_accel_proj
-            a1 = resist_accel_proj
-
-            shift_no_resist = (v * t) + (a0 * (t ** 2) / 2)
-            shift_with_resist = (v * t) + ((a0 + a1) * (t ** 2) / 2)
-            shift = shift_with_resist if ((shift_no_resist * shift_with_resist) >= 0) else 0
-
-            radius = obj.thread_length
-            circle_len = 2 * m.pi * radius
-            shift_angle = 360 * shift / circle_len
-            
-            pos = obj.positions[-1][0]
+            pos = obj.position
             center = obj.attachment_point
-            to_center = sm.vector_from_point_to_point(pos, center)
-            moving_clockwise = (m.sin(sm.to_radians(speed[1] - to_center[1])) > 0)
-            angle_coeff = (-1) if moving_clockwise else 1
+            speed = obj.speed
+            radius = obj.thread_length
+            t = passed_time
+
+            new_pos_free = sm.move_point_by_vector(pos,
+                                                   sm.vector_sum(sm.vector_times(speed, t),
+                                                                 sm.vector_times(sum_accel, (t ** 2) / 2)))
+            new_speed_free = sm.vector_sum(speed,
+                                           sm.vector_times(sum_accel, t))
             
-            from_center_old = sm.vector_from_point_to_point(center, pos)
-            from_center_new = (radius, (from_center_old[1] + (shift_angle * angle_coeff)))
+            radius_vector_old = sm.vector_from_point_to_point(center, pos)
+            radius_vector_free = sm.vector_from_point_to_point(center, new_pos_free)
+            radius_vector_new = (radius, radius_vector_free[1])
+
+            new_pos = sm.move_point_by_vector(center, radius_vector_new)
+            new_speed_0 = (new_speed_free[0], new_speed_free[1] + (radius_vector_new[1] - radius_vector_old[1]))
+
+            new_speed_1 = sm.vector_sum((speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1])),
+                                        sm.vector_times(sum_accel, t))
             
-            new_pos = sm.move_point_by_vector(pos, from_center_new)
+            new_speed_2 = sm.vector_diff(new_speed_1,
+                                         sm.projection(sm.vector_times(sum_accel, t),
+                                                       sm.perpendicular(speed)))
+            
+            new_speed_3 = sm.projection(new_speed_1,
+                                        (speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1])))
+            
+            new_speed = new_speed_3
+
             last_time = obj.positions[-1][1]
-            curr_time = last_time + passed_time
+            curr_time = last_time + t
             obj.position = new_pos
             obj.positions.append((new_pos, curr_time))
             obj.positions = obj.positions[1:]
-            obj.tilt_angle = -(from_center_new[1] + 90)
-
-            a_real = 2 * (shift - (v * t)) / (t ** 2)
-            v_new = v + (a_real * t)
-            ang_new = from_center_new[1] - (90 * angle_coeff)
-            speed_new = sm.vector_to_standard((v_new, ang_new))
-            obj.speed = speed_new
-            obj.last_acceleration = sm.vector_to_standard((a_real, ang_new))
+            obj.speed = sm.vector_to_standard(new_speed)
+            obj.tilt_angle = 90 + radius_vector_new[1]
         
         trace_data = list()
         
@@ -142,46 +141,50 @@ def get_rect(color: tuple[int, int, int, int], size: tuple[int, int]):
     pg.draw.rect(image, color, pg.Rect(0, 0, size[0], size[1]))
     return image
 
-def set_object(object_option: str, speed: tuple[float, float], attachment: tuple[float, float]) -> Object:
+def set_object(object_option: str, obj_speed: tuple[float, float], attachment: tuple[float, float]) -> Object:
     parameters = c.OBJECTS[object_option]
 
-    shape = parameters['shape']
-    drag_coefficient = parameters['drag coefficient']
-    mass = parameters['mass']
+    obj_shape = parameters['shape']
+    obj_drag_coefficient = parameters['drag coefficient']
+    obj_mass = parameters['mass']
     color_no_alpha = parameters['color']
     color = (color_no_alpha[0], color_no_alpha[1], color_no_alpha[2], c.DRAWING_OPACITY)
-    thread_length = c.THREAD_LENGTH
-    position = c.X, c.Y
-    if (shape == 'parallelogram'):
-        radius = None
-        size = parameters['size']
+    obj_thread_length = c.THREAD_LENGTH
+    obj_position = c.X, c.Y
+    if (obj_shape == 'parallelogram'):
+        obj_size = parameters['size']
         image = get_rect(color, (100, 100))
-    elif (shape == 'sphere'):
-        radius = parameters['radius']
-        size = (2 * radius, 2 * radius)
+        obj = Object(image, size = obj_size,
+                            position = obj_position,
+                            speed = obj_speed,
+                            attachment_point = attachment,
+                            shape = obj_shape,
+                            mass = obj_mass,
+                            trace_color = color_no_alpha,
+                            drag_coefficient = obj_drag_coefficient,
+                            thread_length = obj_thread_length,
+                            movable = True)
+    elif (obj_shape == 'sphere'):
+        obj_radius = parameters['radius']
         image = get_circle(color, 50)
-    else:
-        radius, size, image = None, None, None
-    
-    obj = Object(image, radius = radius,
-                        size = size,
-                        position = position,
-                        speed = speed,
-                        attachment_point = attachment,
-                        shape = shape,
-                        mass = mass,
-                        trace_color = color_no_alpha,
-                        drag_coefficient = drag_coefficient,
-                        thread_length = thread_length,
-                        movable = True)
+        obj = Object(image, radius = obj_radius,
+                            position = obj_position,
+                            speed = obj_speed,
+                            attachment_point = attachment,
+                            shape = obj_shape,
+                            mass = obj_mass,
+                            trace_color = color_no_alpha,
+                            drag_coefficient = obj_drag_coefficient,
+                            thread_length = obj_thread_length,
+                            movable = True)
     
     return obj
 
-def set_process(environment_option: str, objects: list[Object], scale: float, window_size: tuple[int, int], center_point: tuple[float, float], process_info: str) -> Process:
-    process = Process(objects = objects,
-                      scale = scale,
+def set_process(environment_option: str, objects_list: list[Object], draw_scale: float, window_size: tuple[int, int], center: tuple[float, float], process_info: str) -> Process:
+    process = Process(objects = objects_list,
+                      scale = draw_scale,
                       background = set_background(window_size),
-                      center_point = center_point,
+                      center_point = center,
                       description = process_info,
                       update = get_update_func(environment_option))
     return process
