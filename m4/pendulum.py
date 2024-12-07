@@ -40,9 +40,19 @@ def get_update_func(environment_option: str):
                 if (not (last_time is None)):
                     period = amp_time - last_time
                     print(f'amplitude: {amplitude:.2f} m, period: {period:.2f} s')
+                    
+                    period_data = getattr(obj, 'period_data', (0, 0))
+                    period_data = (period_data[0] + period, period_data[1] + 1)
+                    obj.period_data = period_data
                 else:
                     print(f'amplitude: {amplitude:.2f} m')
                 obj.last_amplitude_time = amp_time
+                obj.last_amplitude = amplitude
+                first_amplitude = getattr(obj, 'first_amplitude', None)
+                obj.first_amplitude = amplitude if (first_amplitude is None) else first_amplitude
+
+                max_speed = getattr(obj, 'max_speed', 0)
+                obj.max_speed = max(max_speed, abs(obj.speed[0]))
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient

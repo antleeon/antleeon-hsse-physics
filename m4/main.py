@@ -46,9 +46,10 @@ def set_simulation(environment_option: str, object_option: str) -> Simulation:
 if (__name__ == '__main__'):
     # choose option:
     #simulation = set_simulation('Earth, air', 'ball')
-    #simulation = set_simulation('Earth, air', 'brick')
+    simulation = set_simulation('Earth, air', 'brick')
     #simulation = set_simulation('Earth, water', 'ball')
     #simulation = set_simulation('Earth, air', 'baloon')
-    simulation = set_simulation('Mars, atmosphere', 'ball')
+    #simulation = set_simulation('Mars, atmosphere', 'ball')
     
     simulation.run_processes()
+    simulation.print_results()

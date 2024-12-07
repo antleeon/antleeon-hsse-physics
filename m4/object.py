@@ -63,3 +63,20 @@ class Object: # at this point i sould've probably done class inheritance
         else:
             volume = 0
         return volume
+    
+    def describe(self) -> None:
+        print('object:')
+
+        per = getattr(self, 'period_data', None)
+        if (not (per is None)):
+            print(f'  average period: {(per[0] / per[1]):.2f} s')
+        
+        #print(f'  maximum speed: {self.max_speed:.2f} m/s')
+
+        famp = getattr(self, 'first_amplitude', None)
+        if (not (famp is None)):
+            print(f'  first amplitude: {famp:.2f} m')
+
+        lamp = getattr(self, 'last_amplitude', None)
+        if (not (lamp is None)):
+            print(f'  last amplitude: {lamp:.2f} m')

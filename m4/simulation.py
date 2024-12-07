@@ -87,6 +87,12 @@ class Simulation:
             process.redraw(curr_subscreen)
             self.screen.blit(curr_subscreen, self.get_subscreen_position(i))
         self.reset_update_interval()
+
+    def print_results(self) -> None:
+        for proc in self.processes:
+            proc.describe()
+            for obj in proc.objects:
+                obj.describe()
     
     def run_processes(self) -> None:
         for process in self.processes:
