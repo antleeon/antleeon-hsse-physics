@@ -51,8 +51,8 @@ def get_update_func(environment_option: str):
                 first_amplitude = getattr(obj, 'first_amplitude', None)
                 obj.first_amplitude = amplitude if (first_amplitude is None) else first_amplitude
 
-                max_speed = getattr(obj, 'max_speed', 0)
-                obj.max_speed = max(max_speed, abs(obj.speed[0]))
+            max_speed = getattr(obj, 'max_speed', 0)
+            obj.max_speed = max(max_speed, abs(obj.speed[0]))
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient

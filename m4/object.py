@@ -71,7 +71,9 @@ class Object: # at this point i sould've probably done class inheritance
         if (not (per is None)):
             print(f'  average period: {(per[0] / per[1]):.2f} s')
         
-        #print(f'  maximum speed: {self.max_speed:.2f} m/s')
+        maxv = getattr(self, 'max_speed', None)
+        if (not (maxv is None)):
+            print(f'  maximum speed: {maxv:.2f} m/s')
 
         famp = getattr(self, 'first_amplitude', None)
         if (not (famp is None)):

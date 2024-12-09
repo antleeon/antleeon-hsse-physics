@@ -33,7 +33,7 @@ def set_simulation(environment_option: str, object_option: str) -> Simulation:
     
     window_size, draw_scale, center_point = get_screen_settings(boundaries)
     simulation_time_scale = period / const.OPTIMAL_SIMULATION_TIME
-    process_info = f'Process information:\n  period: {period:.2f} s\n  maximum speed: {max_speed_abs:.2f} m/s\n  amplitude: {amplitude:.2f} m'
+    process_info = f'Theoretically calculated:\n  period: {period:.2f} s\n  maximum speed: {max_speed_abs:.2f} m/s\n  amplitude: {amplitude:.2f} m'
 
     object = pendulum.set_object(object_option, speed, attachment)
     process = pendulum.set_process(environment_option, [object], draw_scale, window_size, center_point, process_info)
@@ -45,8 +45,8 @@ def set_simulation(environment_option: str, object_option: str) -> Simulation:
 
 if (__name__ == '__main__'):
     # choose option:
-    #simulation = set_simulation('Earth, air', 'ball')
-    simulation = set_simulation('Earth, air', 'brick')
+    simulation = set_simulation('Earth, air', 'ball')
+    #simulation = set_simulation('Earth, air', 'brick')
     #simulation = set_simulation('Earth, water', 'ball')
     #simulation = set_simulation('Earth, air', 'baloon')
     #simulation = set_simulation('Mars, atmosphere', 'ball')

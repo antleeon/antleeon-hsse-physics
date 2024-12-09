@@ -28,7 +28,7 @@ THREAD_LINE_WIDTH = 4 # pixels
 # object
 
 # starting conditions
-ANGULAR_VELOCITY = 150 # degrees per second
+ANGULAR_VELOCITY = 25 # degrees per second
 ANGLE = 30 # degrees (starting position)
 X, Y = 0, 0 # meters (in relation to abstract coordinate center)
 # starting conditions
@@ -51,7 +51,7 @@ ENVIRONMENT_CONDITIONS = {
     'gravitational acceleration': (3.7, -90)
   }
 }
-WITH_ENVIRONMENTAL_RESISTANCE = True
+WITH_ENVIRONMENTAL_RESISTANCE = False
 WITH_ARCHIMEDES_FORCE = True
 # environment conditions
 

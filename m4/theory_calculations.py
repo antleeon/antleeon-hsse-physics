@@ -14,7 +14,8 @@ def count(environment_option: str, object_option: str) -> dict:
     def count_speed() -> tuple[float, float]:
         angular_velocity = const.ANGULAR_VELOCITY
         trajectory_radius = const.THREAD_LENGTH
-        speed_size = (angular_velocity / 360) * trajectory_radius # not speed_abs, as it's signed (where negative is opposite direction)
+        trajectory_length = 2 * m.pi * trajectory_radius
+        speed_size = (angular_velocity / 360) * trajectory_length # not speed_abs, as it's signed (where negative is opposite direction)
         thread_angle = const.ANGLE
         speed_angle = thread_angle + 180
         speed = (speed_size, speed_angle)
