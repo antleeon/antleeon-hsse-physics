@@ -2,7 +2,7 @@ import constants as const
 import some_math as sm
 import math as m
 
-def count(environment_option: str, object_option: str) -> dict:
+def count(environment_option: str, object_option: str, find_real_period: bool = False) -> dict:
     def count_attachment_point() -> tuple[float, float]:
         angle = const.ANGLE
         thread_len = const.THREAD_LENGTH
@@ -120,6 +120,43 @@ def count(environment_option: str, object_option: str) -> dict:
 
         return amplitude
     
+    def count_real_period() -> float:
+        def is_amplitude_moment(w1: float, w2: float):
+            return ((w1 * w2) < 0)
+        
+        def is_middle_moment(ang1: float, ang2: float):
+            ang1, ang2 = (ang1 % 360) - 270, (ang2 % 360) - 270
+            return ((ang1 * ang2) < 0)
+        
+        def get_inertia_moment():
+            mass = const.OBJECTS[object_option]['mass']
+            radius = const.THREAD_LENGTH
+            inertia_moment = mass * (radius ** 2)
+            return inertia_moment
+        
+        UPDATE_TIME_PERIOD = 0.03 # seconds
+        
+        period_time = None
+        center_time = None
+        passed_time = 0
+
+        w0 = w = w_prev = m.sqrt(const.ENVIRONMENT_CONDITIONS[environment_option]['gravitational acceleration'][0] / const.THREAD_LENGTH)
+        ang = ang_prev = sm.to_radians(-90 + const.ANGLE)
+
+        while ((not period_time) or (not center_time)):
+            w_prev, ang_prev = w, ang
+            ang_acc = -(w0 ** 2) * m.sin(ang)
+            ang = ang + (w * UPDATE_TIME_PERIOD) + (ang_acc * (UPDATE_TIME_PERIOD ** 2) / 2)
+            w = w + ang_acc * UPDATE_TIME_PERIOD
+
+            passed_time += UPDATE_TIME_PERIOD
+            period_time = passed_time if is_amplitude_moment(w_prev, w) else period_time
+            center_time = passed_time if is_middle_moment(ang_prev, ang) else center_time
+
+        period = 4 * abs(period_time - center_time)
+        
+        return period
+    
     res = dict()
 
     res['boundaries'] = count_boundaries()
@@ -128,5 +165,8 @@ def count(environment_option: str, object_option: str) -> dict:
     res['speed'] = count_speed()
     res['maximum speed module'] = count_max_speed_abs()
     res['amplitude'] = count_amplitude()
+    
+    if (find_real_period):
+        res['real period'] = count_real_period()
 
     return res

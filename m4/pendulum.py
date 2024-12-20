@@ -13,7 +13,7 @@ def get_update_func(environment_option: str):
     env_visc = kin_vesc * env_dens
     with_resist = c.WITH_ENVIRONMENTAL_RESISTANCE
 
-    def update_func(self: Process, passed_time: float) -> list:
+    def update_func(self: Process, passed_time: float, return_period: bool = False) -> list | float:
         def check_amplitude(obj: Object) -> None:
             def is_left_amplitude() -> bool:
                 center = obj.attachment_point
@@ -26,6 +26,7 @@ def get_update_func(environment_option: str):
                 res = ((x_c - x) > 0) & ((x_b - x) > 0) & ((x_a - x) > 0)
                 return res
             
+            period = None
             if is_left_amplitude():
                 amp = obj.positions[-2]
                 amp_pos, amp_time = amp
@@ -53,6 +54,8 @@ def get_update_func(environment_option: str):
 
             max_speed = getattr(obj, 'max_speed', 0)
             obj.max_speed = max(max_speed, abs(obj.speed[0]))
+
+            return period
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient
@@ -132,13 +135,15 @@ def get_update_func(environment_option: str):
         trace_data = list()
         
         for obj in self.objects:
-            check_amplitude(obj)
+            period = check_amplitude(obj)
             update_motion(obj)
 
             positions = obj.positions
             last_position, new_position = positions[-2][0], positions[-1][0]
             trace_data.append((last_position, new_position, obj.trace_color))
 
+        if (return_period):
+            return period
         return trace_data
     
     return update_func
@@ -205,3 +210,12 @@ def set_process(environment_option: str, objects_list: list[Object], draw_scale:
                       description = process_info,
                       update = get_update_func(environment_option))
     return process
+
+def get_real_period(process: Process) -> float:
+    UPDATE_TIME_PERIOD = 0.03 # seconds
+
+    period = None
+    while (not period):
+        period = process.update(UPDATE_TIME_PERIOD, True)
+
+    return period
