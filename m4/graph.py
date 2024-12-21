@@ -14,7 +14,7 @@ from scipy.optimize import curve_fit
 
 ANGLE_INTERVAL = (0, 85)
 POINTS_QUANTITY = 200
-OBJECT_OPTION = 'brick'
+OBJECT_OPTION = 'ball'
 ENVIRONMENT_OPTION = 'Earth, air'
 PERCENT_STEP = 20
 
