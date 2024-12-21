@@ -121,41 +121,16 @@ def count(environment_option: str, object_option: str, find_real_period: bool = 
         return amplitude
     
     def count_real_period() -> float:
-        def is_amplitude_moment(w1: float, w2: float):
-            return ((w1 * w2) < 0)
+        T0 = count_period()
+        g = const.ENVIRONMENT_CONDITIONS[environment_option]['gravitational acceleration'][0]
+        v = count_max_speed_abs()
+        E_by_m = (v ** 2) / 2
+        h = E_by_m / g
+        l = const.THREAD_LENGTH
+        alpha = m.acos(1 - (h / l)) # h = l (1 - cos(alpha)) => 1 - cos(alpha) = h / l => cos(alpha) = 1 - (h / l) => alpha = arccos(1 - (h / l))
+        T = T0 * (1 + ((alpha ** 2) / 16))
         
-        def is_middle_moment(ang1: float, ang2: float):
-            ang1, ang2 = (ang1 % 360) - 270, (ang2 % 360) - 270
-            return ((ang1 * ang2) < 0)
-        
-        def get_inertia_moment():
-            mass = const.OBJECTS[object_option]['mass']
-            radius = const.THREAD_LENGTH
-            inertia_moment = mass * (radius ** 2)
-            return inertia_moment
-        
-        UPDATE_TIME_PERIOD = 0.03 # seconds
-        
-        period_time = None
-        center_time = None
-        passed_time = 0
-
-        w0 = w = w_prev = m.sqrt(const.ENVIRONMENT_CONDITIONS[environment_option]['gravitational acceleration'][0] / const.THREAD_LENGTH)
-        ang = ang_prev = sm.to_radians(-90 + const.ANGLE)
-
-        while ((not period_time) or (not center_time)):
-            w_prev, ang_prev = w, ang
-            ang_acc = -(w0 ** 2) * m.sin(ang)
-            ang = ang + (w * UPDATE_TIME_PERIOD) + (ang_acc * (UPDATE_TIME_PERIOD ** 2) / 2)
-            w = w + ang_acc * UPDATE_TIME_PERIOD
-
-            passed_time += UPDATE_TIME_PERIOD
-            period_time = passed_time if is_amplitude_moment(w_prev, w) else period_time
-            center_time = passed_time if is_middle_moment(ang_prev, ang) else center_time
-
-        period = 4 * abs(period_time - center_time)
-        
-        return period
+        return T
     
     res = dict()
 
