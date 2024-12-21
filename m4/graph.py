@@ -13,18 +13,17 @@ from process import Process
 from scipy.optimize import curve_fit
 
 ANGLE_INTERVAL = (0, 85)
-POINTS_QUANTITY = 50
-OBJECT_OPTION = 'ball'
+POINTS_QUANTITY = 200
+OBJECT_OPTION = 'brick'
 ENVIRONMENT_OPTION = 'Earth, air'
 PERCENT_STEP = 20
-PREPROCESS = True
 
-def process_points(x: list[float], y: list[float]) -> list[float]:
+def process_points(x: list[float], y: list[float], process: bool = True) -> list[float]:
     def func(x, a, b, c):
         return (a + (b * (x ** c)))
     
     y_new = y
-    if (PREPROCESS):
+    if (process):
         popt, pcov = curve_fit(func, x, y)
         y_new = func(x, *popt)
     
@@ -73,10 +72,10 @@ if (__name__ == '__main__'):
 
     print('Graph points calculated') # debug
 
-    real_points = process_points(angle_points, real_points)
-    theory_points = process_points(angle_points, theory_points)
-    harmonic_points = process_points(angle_points, harmonic_points)
+    approximated_points = process_points(angle_points, real_points)
+
     plt.plot(angle_points, real_points)
+    plt.plot(angle_points, approximated_points)
     plt.plot(angle_points, theory_points)
     plt.plot(angle_points, harmonic_points)
     #plt.ylim(ymin = 0)
@@ -84,5 +83,5 @@ if (__name__ == '__main__'):
     plt.xlabel('Angle amplitude, degrees')
     plt.ylabel('Period, seconds')
     plt.grid()
-    plt.legend(['real', 'theoretical', 'harmonic'])
+    plt.legend(['real', 'approximated', 'theoretical', 'harmonic'])
     plt.show()
