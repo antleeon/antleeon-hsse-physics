@@ -10,15 +10,25 @@ import pendulum
 
 from object import Object
 from process import Process
+from scipy.optimize import curve_fit
 
 ANGLE_INTERVAL = (0, 85)
-POINTS_QUANTITY = 200
+POINTS_QUANTITY = 50
 OBJECT_OPTION = 'ball'
 ENVIRONMENT_OPTION = 'Earth, air'
-PERCENT_STEP = 10
+PERCENT_STEP = 20
+PREPROCESS = True
 
 def process_points(x: list[float], y: list[float]) -> list[float]:
-    return y
+    def func(x, a, b, c):
+        return (a + (b * (x ** c)))
+    
+    y_new = y
+    if (PREPROCESS):
+        popt, pcov = curve_fit(func, x, y)
+        y_new = func(x, *popt)
+    
+    return y_new
 
 def find_real_period(res: dict) -> float:
     attachment = res['attachment']

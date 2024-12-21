@@ -58,7 +58,7 @@ def get_update_func(environment_option: str):
             max_speed = getattr(obj, 'max_speed', 0)
             obj.max_speed = max(max_speed, abs(obj.speed[0]))
 
-            if ((period_data) and (period_data[1] > 30)):
+            if ((period_data) and (period_data[1] > 5)):
                 return (period_data[0] / period_data[1])
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
