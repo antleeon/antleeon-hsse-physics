@@ -1,6 +1,7 @@
 import constants as c
 import math as m
 import some_math as sm
+import numpy as np
 import pygame as pg
 from object import Object
 from process import Process
@@ -40,13 +41,15 @@ def get_update_func(environment_option: str):
                 last_time = obj.last_amplitude_time
                 if (not (last_time is None)):
                     period = amp_time - last_time
-                    print(f'amplitude: {amplitude:.2f} m, period: {period:.2f} s')
+                    if (not return_period):
+                        print(f'amplitude: {amplitude:.2f} m, period: {period:.2f} s')
                     
                     period_data = getattr(obj, 'period_data', (0, 0))
                     period_data = (period_data[0] + period, period_data[1] + 1)
                     obj.period_data = period_data
                 else:
-                    print(f'amplitude: {amplitude:.2f} m')
+                    if (not return_period):
+                        print(f'amplitude: {amplitude:.2f} m')
                 obj.last_amplitude_time = amp_time
                 obj.last_amplitude = amplitude
                 first_amplitude = getattr(obj, 'first_amplitude', None)
@@ -55,7 +58,7 @@ def get_update_func(environment_option: str):
             max_speed = getattr(obj, 'max_speed', 0)
             obj.max_speed = max(max_speed, abs(obj.speed[0]))
 
-            if ((period_data) and (period_data[1] > 20)):
+            if ((period_data) and (period_data[1] > 30)):
                 return (period_data[0] / period_data[1])
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
@@ -99,6 +102,66 @@ def get_update_func(environment_option: str):
             radius_vector_old = sm.vector_from_point_to_point(center, pos)
             radius_vector_free = sm.vector_from_point_to_point(center, new_pos_free)
             radius_vector_new = (radius, radius_vector_free[1])
+
+            new_pos = sm.move_point_by_vector(center, radius_vector_new)
+            
+            speed_turned = (speed[0], speed[1] + (radius_vector_new[1] - radius_vector_old[1]))
+            movement_axis = (1, sm.vector_from_point_to_point(pos, new_pos)[1])
+            
+            pot_accel = sm.vector_sum(grav_accel, arch_accel)
+            resist_accel_turned = (resist_accel[0], resist_accel[1] + (movement_axis[1] - speed[1]))
+
+            pot_speed_diff = sm.vector_times(pot_accel, t)
+            resist_speed_diff = sm.vector_times(resist_accel_turned, t)
+
+            pot_diff_proj = sm.projection(pot_speed_diff, movement_axis)
+            mid_speed = sm.vector_sum(speed_turned, pot_diff_proj)
+
+            max_resist_diff_proj = sm.vector_times(sm.projection(mid_speed, movement_axis), (-1))
+            resist_diff_proj = resist_speed_diff if (max_resist_diff_proj[0] >= resist_speed_diff[0]) else max_resist_diff_proj
+
+            new_speed = sm.vector_sum(mid_speed, resist_diff_proj)
+
+            v_0, v_d = speed[0], -(resist_diff_proj[0])
+            g = pot_accel[0]
+            h_0, h_f = pos[1], new_pos[1]
+            v_f = m.sqrt(abs((2 * g * (h_0 - h_f)) + (v_0 ** 2)))
+            new_speed = ((v_f + v_d), new_speed[1])
+
+            last_time = obj.positions[-1][1]
+            curr_time = last_time + t
+            obj.position = new_pos
+            obj.positions.append((new_pos, curr_time))
+            obj.positions = obj.positions[1:]
+            obj.speed = sm.vector_to_standard(new_speed)
+            obj.tilt_angle = 90 + radius_vector_new[1]
+
+        def update_motion_new(obj: Object) -> None: # doesn't work on the whole range
+            arch_accel = archimedes_accel(obj) if c.WITH_ARCHIMEDES_FORCE else (0, 0)
+            resist_accel = resistance_accel(obj) if c.WITH_ENVIRONMENTAL_RESISTANCE else (0, 0)
+
+            sum_accel = sm.sum_vectors([grav_accel, arch_accel, resist_accel])
+
+            pos = obj.position
+            center = obj.attachment_point
+            speed = obj.speed
+            radius = obj.thread_length
+            t = passed_time
+            l = 2 * m.pi * radius
+            
+            shift = (speed[0] * t) + (((sm.projection_codirectional(sum_accel, speed)[0]) * (t ** 2)) / 2)
+            ang_shift = 360 * (shift / l)
+
+            new_pos_free = sm.move_point_by_vector(pos,
+                                                   sm.vector_sum(sm.vector_times(speed, t),
+                                                                 sm.vector_times(sum_accel, (t ** 2) / 2)))
+            
+            radius_vector_old = sm.vector_from_point_to_point(center, pos)
+            radius_vector_free = sm.vector_from_point_to_point(center, new_pos_free)
+            radius_vector_new = (radius, radius_vector_free[1])
+
+            signed_ang_shift = np.sign(radius_vector_new[1] - radius_vector_old[1]) * abs(ang_shift)
+            radius_vector_new = (radius, radius_vector_old[1] + signed_ang_shift)
 
             new_pos = sm.move_point_by_vector(center, radius_vector_new)
             

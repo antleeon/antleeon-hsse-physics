@@ -12,20 +12,13 @@ from object import Object
 from process import Process
 
 ANGLE_INTERVAL = (0, 85)
-POINTS_QUANTITY = 400
+POINTS_QUANTITY = 200
 OBJECT_OPTION = 'ball'
 ENVIRONMENT_OPTION = 'Earth, air'
+PERCENT_STEP = 10
 
 def process_points(x: list[float], y: list[float]) -> list[float]:
-    y_n = [0.5 * (y[i - 1] + y[i + 1]) for i in range(1, len(y) - 1)]
-    y_n.append(y_n[-1])
-    y_n.insert(0, y_n[0])
-
-    y_p = [(y_n[i - 1] * y_n[i + 1]) ** (0.5) for i in range(1, len(y_n) - 1)]
-    y_p.append(y_n[-1])
-    y_p.insert(0, y_n[0])
-
-    return y_p
+    return y
 
 def find_real_period(res: dict) -> float:
     attachment = res['attachment']
@@ -45,6 +38,8 @@ if (__name__ == '__main__'):
     real_points = list()
     harmonic_points = list()
 
+    percent_done = 0
+
     for i in range(POINTS_QUANTITY):
         ang = ANGLE_INTERVAL[0] + (((ANGLE_INTERVAL[1] - ANGLE_INTERVAL[0]) / (POINTS_QUANTITY - 1)) * i)
         angle_points.append(abs(ang) * 2)
@@ -60,6 +55,11 @@ if (__name__ == '__main__'):
         theory_points.append(theory_period)
         real_points.append(real_period)
         harmonic_points.append(harmonic_period)
+
+        percent_done_new = ((i / POINTS_QUANTITY * 100) // PERCENT_STEP) * PERCENT_STEP
+        if (percent_done_new > percent_done):
+            print(f'{int(percent_done_new)}% of calculations complete...')
+            percent_done = percent_done_new  
 
     print('Graph points calculated') # debug
 
