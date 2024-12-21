@@ -13,10 +13,10 @@ from process import Process
 from scipy.optimize import curve_fit
 
 ANGLE_INTERVAL = (0, 85)
-POINTS_QUANTITY = 200
+POINTS_QUANTITY = 300
 OBJECT_OPTION = 'ball'
 ENVIRONMENT_OPTION = 'Earth, air'
-PERCENT_STEP = 20
+PERCENT_STEP = 10
 
 def process_points(x: list[float], y: list[float], process: bool = True) -> list[float]:
     def func(x, a, b, c):
@@ -51,7 +51,7 @@ if (__name__ == '__main__'):
 
     for i in range(POINTS_QUANTITY):
         ang = ANGLE_INTERVAL[0] + (((ANGLE_INTERVAL[1] - ANGLE_INTERVAL[0]) / (POINTS_QUANTITY - 1)) * i)
-        angle_points.append(abs(ang) * 2)
+        angle_points.append(ang)
         const.ANGLE = ang
         #const.ANGULAR_VELOCITY = 0
 
