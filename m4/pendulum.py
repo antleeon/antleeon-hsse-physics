@@ -26,7 +26,7 @@ def get_update_func(environment_option: str):
                 res = ((x_c - x) > 0) & ((x_b - x) > 0) & ((x_a - x) > 0)
                 return res
             
-            period = None
+            period_data = None
             if is_left_amplitude():
                 amp = obj.positions[-2]
                 amp_pos, amp_time = amp
@@ -55,7 +55,8 @@ def get_update_func(environment_option: str):
             max_speed = getattr(obj, 'max_speed', 0)
             obj.max_speed = max(max_speed, abs(obj.speed[0]))
 
-            return period
+            if ((period_data) and (period_data[1] > 20)):
+                return (period_data[0] / period_data[1])
         
         def resistance_accel(obj: Object) -> tuple[float, float]: # quadratic
             drag = obj.drag_coefficient
