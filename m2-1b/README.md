@@ -136,18 +136,18 @@ FFT — это алгоритм, который эффективно вычис�
 [formula9]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=e^{-\alpha(t-t_0)^2}\sin(2\pi%20f_0%20t)
 [formula10]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=\sum_{i=1}^N%20A_i\sin(2\pi%20f_i%20t)
 
-[fc]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_c
-[f0]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_0
-[Q]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;Q
-[N]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;N
-[k]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;k
-[A]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A
-[f]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f
-[phi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;\phi
-[At]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A(t)
-[alpha]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;\alpha
-[fi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_i
-[Ai]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A_i
+[fc]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;f_c
+[f0]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;f_0
+[Q]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;Q
+[N]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;N
+[k]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;k
+[A]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;A
+[f]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;f
+[phi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;\phi
+[At]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;A(t)
+[alpha]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;\alpha
+[fi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;f_i
+[Ai]: https://latex.codecogs.com/png.image?\bg{white}\dpi{120}&space;A_i
 
 ---
 
@@ -262,6 +262,10 @@ FFT — это алгоритм, который эффективно вычис�
 ### Пример 8: Узкополосный фильтр и широкополосный сигнал
 - **Сигнал**: Широкополосный сигнал с частотами 10, 30, 50, 70, 90 Гц.
 - **Фильтр**: Узкополосный фильтр с диапазоном 40–70 Гц и шириной переходной области 10 Гц.
+
+### Пример 9: Узкополосный фильтр и модулированный сигнал с двумя модулирующими частотами
+- **Сигнал**: Модулированный сигнал с несущей частотой 50 Гц и двумя модулирующими частотами 5 Гц и 10 Гц.
+- **Фильтр**: Узкополосный фильтр с диапазоном 5–20 Гц, отсекающий несущую частоту.
 
 ---
 

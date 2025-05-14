@@ -167,3 +167,20 @@ if __name__ == "__main__":
       'transition_width': 10  # Ширина переходной области, Гц
     }
   )
+
+  # Пример 9: Узкополосный фильтр, отсекающий несущую частоту, с двумя модулирующими частотами
+  simulate_response(
+    signal_func=modulated_signal,
+    filter_func=band_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'carrier_freq': 50,  # Несущая частота, Гц
+      'mod_freq': [5, 10]  # Две модулирующие частоты, Гц
+    },
+    filter_kwargs={
+      'low_cutoff': 5,  # Нижняя граница полосы, Гц
+      'high_cutoff': 20,  # Верхняя граница полосы, Гц
+      'transition_width': 5  # Ширина переходной области, Гц
+    }
+  )

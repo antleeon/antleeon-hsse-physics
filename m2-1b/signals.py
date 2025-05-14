@@ -22,9 +22,14 @@ def modulated_signal(t, carrier_freq, mod_freq):
   Генерация модулированного сигнала.
   t: массив времени, секунды
   carrier_freq: несущая частота, Гц
-  mod_freq: частота модуляции, Гц
+  mod_freq: одна или несколько модулирующих частот, Гц (может быть числом или списком)
   """
-  return np.sin(2 * np.pi * carrier_freq * t) * (1 + 0.5 * np.sin(2 * np.pi * mod_freq * t))
+  if isinstance(mod_freq, (list, tuple)):  # Если передан список частот
+    modulation = sum(np.sin(2 * np.pi * f * t) for f in mod_freq)
+  else:  # Если передано одно значение частоты
+    modulation = np.sin(2 * np.pi * mod_freq * t)
+  
+  return np.sin(2 * np.pi * carrier_freq * t) * (1 + 0.5 * modulation)
 
 def wave_packet(t, center_freq, width):
   """
