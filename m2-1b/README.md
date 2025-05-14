@@ -39,9 +39,12 @@ m2-1b/
 
 #### Преобразование Фурье
 Формула прямого преобразования Фурье:
-![formula1](https://latex.codecogs.com/png.image?\dpi{110}&space;F(f)=\int_{-\infty}^{\infty}x(t)e^{-2\pi\;i\;f\;t}dt)
+
+![formula1](https://latex.codecogs.com/png.image?\bg{white}\dpi{110}&space;F(f)=\int_{-\infty}^{\infty}x(t)%20e^{-2\pi%20i%20f%20t}dt)
+
 Формула обратного преобразования Фурье:
-![formula2](https://latex.codecogs.com/png.image?\dpi{110}&space;x(t)=\int_{-\infty}^{\infty}F(f)\;e^{2\pi\;i\;f\;t}df)
+
+![formula2](https://latex.codecogs.com/png.image?\bg{white}\dpi{110}&space;x(t)=\int_{-\infty}^{\infty}F(f)%20e^{2\pi%20i%20f%20t}df)
 
 ### Фильтры
 1. **Фильтр низких частот (ФНЧ)**: Пропускает частоты ниже заданного порога (частоты среза) и подавляет высокие частоты.
