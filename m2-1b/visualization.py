@@ -19,28 +19,28 @@ def plot_signals(t, signal, freqs, spectrum, filtered_signal, filtered_spectrum,
   plt.plot(t, signal)
   plt.title("Входной сигнал")
   plt.xlabel("Время (с)")
-  plt.ylabel("Амплитуда")
+  plt.ylabel("Амплитуда (В)")
   
   # Спектр входного сигнала
   plt.subplot(2, 2, 2)
   plt.plot(freqs, np.abs(spectrum))
   plt.title("Спектр входного сигнала")
   plt.xlabel("Частота (Гц)")
-  plt.ylabel("Амплитуда")
+  plt.ylabel("Амплитуда (В)")
   
   # Отфильтрованный сигнал
   plt.subplot(2, 2, 3)
   plt.plot(t, filtered_signal)
   plt.title("Отфильтрованный сигнал")
   plt.xlabel("Время (с)")
-  plt.ylabel("Амплитуда")
+  plt.ylabel("Амплитуда (В)")
   
   # Спектр отфильтрованного сигнала
   plt.subplot(2, 2, 4)
   plt.plot(freqs, np.abs(filtered_spectrum))
   plt.title("Спектр отфильтрованного сигнала")
   plt.xlabel("Частота (Гц)")
-  plt.ylabel("Амплитуда")
+  plt.ylabel("Амплитуда (В)")
   
   # Добавление текстового описания
   plt.gcf().text(0.5, 0.02, description, ha='center', fontsize=10, bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))

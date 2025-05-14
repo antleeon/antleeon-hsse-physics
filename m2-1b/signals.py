@@ -34,3 +34,14 @@ def wave_packet(t, center_freq, width):
   width: ширина пакета, безразмерное
   """
   return np.exp(-width * (t - t.mean())**2) * np.sin(2 * np.pi * center_freq * t)
+
+def broadband_signal(t, freqs):
+  """
+  Генерация широкополосного сигнала.
+  t: массив времени, секунды
+  freqs: список частот, Гц
+  """
+  signal = np.zeros_like(t)
+  for freq in freqs:
+    signal += np.sin(2 * np.pi * freq * t)
+  return signal

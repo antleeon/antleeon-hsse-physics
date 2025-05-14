@@ -1,4 +1,4 @@
-from signals import harmonic_signal, pulse_sequence, modulated_signal
+from signals import harmonic_signal, pulse_sequence, modulated_signal, wave_packet, broadband_signal
 from filters import low_pass_filter, high_pass_filter, band_pass_filter
 from utils import generate_time_grid
 from visualization import plot_signals
@@ -40,7 +40,7 @@ if __name__ == "__main__":
   # Параметры симуляции
   T = 1.0  # Период симуляции, секунды
   N = 1024  # Количество точек дискретизации (безразмерное)
-  
+
   # Пример 1: ФНЧ и гармонический сигнал
   simulate_response(
     signal_func=harmonic_signal,
@@ -51,10 +51,11 @@ if __name__ == "__main__":
       'freq': 50  # Частота гармонического сигнала, Гц
     },
     filter_kwargs={
-      'cutoff': 60  # Частота среза ФНЧ, Гц
+      'cutoff': 60,  # Частота среза ФНЧ, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
     }
   )
-  
+
   # Пример 2: ФВЧ и последовательность импульсов
   simulate_response(
     signal_func=pulse_sequence,
@@ -65,10 +66,11 @@ if __name__ == "__main__":
       'freq': 50  # Частота импульсов, Гц
     },
     filter_kwargs={
-      'cutoff': 40  # Частота среза ФВЧ, Гц
+      'cutoff': 40,  # Частота среза ФВЧ, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
     }
   )
-  
+
   # Пример 3: Узкополосный фильтр и модулированный сигнал
   simulate_response(
     signal_func=modulated_signal,
@@ -81,6 +83,87 @@ if __name__ == "__main__":
     },
     filter_kwargs={
       'low_cutoff': 40,  # Нижняя граница полосы, Гц
-      'high_cutoff': 60  # Верхняя граница полосы, Гц
+      'high_cutoff': 60,  # Верхняя граница полосы, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
+    }
+  )
+
+  # Пример 4: ФНЧ и цуг (волновой пакет)
+  simulate_response(
+    signal_func=wave_packet,
+    filter_func=low_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'center_freq': 70,  # Центральная частота, Гц
+      'width': 50         # Ширина пакета, безразмерное
+    },
+    filter_kwargs={
+      'cutoff': 60,  # Частота среза ФНЧ, Гц
+      'transition_width': 15  # Ширина переходной области, Гц
+    }
+  )
+
+  # Пример 5: ФВЧ и гармонический сигнал
+  simulate_response(
+    signal_func=harmonic_signal,
+    filter_func=high_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'freq': 30  # Частота гармонического сигнала, Гц
+    },
+    filter_kwargs={
+      'cutoff': 40,  # Частота среза ФВЧ, Гц
+      'transition_width': 5  # Ширина переходной области, Гц
+    }
+  )
+
+  # Частоты для широкополосного сигнала
+  broadband_freqs = [10, 30, 50, 70, 90]
+
+  # Пример 6: ФНЧ и широкополосный сигнал
+  simulate_response(
+    signal_func=broadband_signal,
+    filter_func=low_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'freqs': broadband_freqs  # Частоты, входящие в сигнал
+    },
+    filter_kwargs={
+      'cutoff': 40,  # Частота среза ФНЧ, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
+    }
+  )
+
+  # Пример 7: ФВЧ и широкополосный сигнал
+  simulate_response(
+    signal_func=broadband_signal,
+    filter_func=high_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'freqs': broadband_freqs  # Частоты, входящие в сигнал
+    },
+    filter_kwargs={
+      'cutoff': 60,  # Частота среза ФВЧ, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
+    }
+  )
+
+  # Пример 8: Узкополосный фильтр и широкополосный сигнал
+  simulate_response(
+    signal_func=broadband_signal,
+    filter_func=band_pass_filter,
+    T=T,
+    N=N,
+    signal_kwargs={
+      'freqs': broadband_freqs  # Частоты, входящие в сигнал
+    },
+    filter_kwargs={
+      'low_cutoff': 40,  # Нижняя граница полосы, Гц
+      'high_cutoff': 70,  # Верхняя граница полосы, Гц
+      'transition_width': 10  # Ширина переходной области, Гц
     }
   )
