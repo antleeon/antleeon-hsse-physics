@@ -43,7 +43,8 @@ def plot_signals(t, signal, freqs, spectrum, filtered_signal, filtered_spectrum,
   plt.ylabel("Амплитуда (В)")
   
   # Добавление текстового описания
-  plt.gcf().text(0.5, 0.02, description, ha='center', fontsize=10, bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
+  plt.gcf().text(0.5, 0.01, description, ha='center', fontsize=10, bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
   
-  plt.tight_layout(rect=[0, 0.05, 1, 1])  # Оставляем место для текста внизу
+  # Увеличиваем нижний отступ
+  plt.tight_layout(rect=[0, 0.1, 1, 1])  # Увеличиваем нижний отступ до 0.1
   plt.show()
