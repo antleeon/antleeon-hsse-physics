@@ -44,20 +44,25 @@ m2-1b/
    - Пропускает частоты ниже заданного порога (частоты среза) и подавляет высокие частоты.
    - Реализуется с помощью комбинации резисторов и конденсаторов (RC-цепь) или катушек индуктивности (RL-цепь).
    - Примерная передаточная функция:
+
      ![formula1][formula1],
+
      где ![fc][fc] — частота среза.
 
 2. **Фильтр высоких частот (ФВЧ)**:
    - Пропускает частоты выше заданного порога и подавляет низкие частоты.
    - Реализуется с помощью RC- или RL-цепей, но с другой конфигурацией.
    - Примерная передаточная функция:
+
      ![formula2][formula2].
 
 3. **Узкополосный фильтр**:
    - Пропускает частоты в заданном диапазоне (полосе пропускания) и подавляет частоты за его пределами.
    - Реализуется с помощью RLC-цепей, где резистор, катушка индуктивности и конденсатор соединены в определенной конфигурации.
    - Примерная передаточная функция:
+
      ![formula3][formula3],
+     
      где ![f0][f0] — центральная частота, а ![Q][Q] — добротность фильтра.
 
 ---
@@ -68,14 +73,18 @@ m2-1b/
 
 #### Преобразование Фурье
 Формула прямого преобразования Фурье:
+
 ![formula4][formula4]
 
 Формула обратного преобразования Фурье:
+
 ![formula5][formula5]
 
 #### Быстрое преобразование Фурье (FFT)
 FFT — это алгоритм, который эффективно вычисляет дискретное преобразование Фурье (DFT):
+
 ![formula6][formula6],
+
 где ![N][N] — количество точек дискретизации, а ![k][k] — индекс частоты.
 
 ---
@@ -84,7 +93,9 @@ FFT — это алгоритм, который эффективно вычис�
 
 1. **Гармонический сигнал**:
    - Представляет собой синусоидальную волну:
+
      ![formula7][formula7],
+
      где ![A][A] — амплитуда, ![f][f] — частота, а ![phi][phi] — фаза.
    - Используется для моделирования простых периодических процессов.
 
@@ -94,19 +105,49 @@ FFT — это алгоритм, который эффективно вычис�
 
 3. **Модулированный сигнал**:
    - Сигнал, амплитуда которого изменяется по закону другой функции:
+
      ![formula8][formula8],
+
      где ![At][At] — огибающая, а ![fc][fc] — несущая частота.
    - Пример: амплитудная модуляция (AM).
 
 4. **Цуг (волновой пакет)**:
    - Сигнал с ограниченной длительностью, сосредоточенный вокруг определенной частоты:
+
      ![formula9][formula9],
+
      где ![f0][f0] — центральная частота, а ![alpha][alpha] — параметр ширины пакета.
 
 5. **Широкополосный сигнал**:
    - Сумма нескольких гармонических сигналов с разными частотами:
+
      ![formula10][formula10],
+
      где ![fi][fi] — частоты, а ![Ai][Ai] — амплитуды.
+
+[formula1]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;H(f)=\frac{1}{1&plus;j\frac{f}{f_c}}
+[formula2]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;H(f)=\frac{j\frac{f}{f_c}}{1&plus;j\frac{f}{f_c}}
+[formula3]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;H(f)=\frac{1}{1&plus;jQ\left(\frac{f}{f_0}-\frac{f_0}{f}\right)}
+[formula4]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;F(f)=\int_{-\infty}^{\infty}x(t)e^{-2\pi%20i%20f%20t}dt
+[formula5]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=\int_{-\infty}^{\infty}F(f)e^{2\pi%20i%20f%20t}df
+[formula6]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;X[k]=\sum_{n=0}^{N-1}x[n]e^{-j\frac{2\pi}{N}kn}
+[formula7]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=A\sin(2\pi%20f%20t&plus;\phi)
+[formula8]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=A(t)\sin(2\pi%20f_c%20t)
+[formula9]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=e^{-\alpha(t-t_0)^2}\sin(2\pi%20f_0%20t)
+[formula10]: https://latex.codecogs.com/png.image?\bg{white}\dpi{150}&space;x(t)=\sum_{i=1}^N%20A_i\sin(2\pi%20f_i%20t)
+
+[fc]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_c
+[f0]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_0
+[Q]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;Q
+[N]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;N
+[k]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;k
+[A]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A
+[f]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f
+[phi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;\phi
+[At]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A(t)
+[alpha]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;\alpha
+[fi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;f_i
+[Ai]: https://latex.codecogs.com/png.image?\bg{white}\dpi{100}&space;A_i
 
 ---
 
@@ -241,31 +282,3 @@ FFT — это алгоритм, который эффективно вычис�
 Связаться с автором: [@antleeon](https://t.me/antleeon)
 
 Проект разработан для учебных целей в рамках курса по моделированию физических процессов ВШПИ МФТИ.
-
----
-
-## Ссылки на формулы
-
-[formula1]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;H(f)=\frac{1}{1&plus;j\frac{f}{f_c}}
-[formula2]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;H(f)=\frac{j\frac{f}{f_c}}{1&plus;j\frac{f}{f_c}}
-[formula3]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;H(f)=\frac{1}{1&plus;jQ\left(\frac{f}{f_0}-\frac{f_0}{f}\right)}
-[formula4]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;F(f)=\int_{-\infty}^{\infty}x(t)e^{-2\pi%20i%20f%20t}dt
-[formula5]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;x(t)=\int_{-\infty}^{\infty}F(f)e^{2\pi%20i%20f%20t}df
-[formula6]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;X[k]=\sum_{n=0}^{N-1}x[n]e^{-j\frac{2\pi}{N}kn}
-[formula7]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;x(t)=A\sin(2\pi%20f%20t&plus;\phi)
-[formula8]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;x(t)=A(t)\sin(2\pi%20f_c%20t)
-[formula9]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;x(t)=e^{-\alpha(t-t_0)^2}\sin(2\pi%20f_0%20t)
-[formula10]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;x(t)=\sum_{i=1}^N%20A_i\sin(2\pi%20f_i%20t)
-
-[fc]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;f_c
-[f0]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;f_0
-[Q]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;Q
-[N]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;N
-[k]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;k
-[A]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;A
-[f]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;f
-[phi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;\phi
-[At]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;A(t)
-[alpha]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;\alpha
-[fi]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;f_i
-[Ai]: https://latex.codecogs.com/png.image?\bg{white}\dpi{200}&space;A_i
