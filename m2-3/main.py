@@ -36,19 +36,24 @@ if __name__ == "__main__":
   # Пример 4: Микроскоп
   lens_system_microscope = [
     ThinLens(focal_length=5, position=10),  # Объектив
-    ThinLens(focal_length=10, position=25)  # Окуляр
+    ThinLens(focal_length=5, position=31)  # Окуляр
   ]
-  object_position_microscope = (8, 1)  # Маленький объект перед объективом
-  ray_angles_microscope = [np.radians(-2), np.radians(0), np.radians(2)]
+  object_position_microscope = (3, 1)  # Маленький объект перед объективом
+  ray_angles_microscope = [np.radians(-5), np.radians(0), np.radians(5)]
   print("Симуляция: Микроскоп")
   run_simulation(lens_system_microscope, object_position_microscope, ray_angles_microscope)
 
   # Пример 5: Телескоп
   lens_system_telescope = [
-    ThinLens(focal_length=15, position=10),  # Объектив
-    ThinLens(focal_length=15, position=25)  # Окуляр
+    ThinLens(focal_length=15, position=5),  # Объектив
+    ThinLens(focal_length=5, position=25)  # Окуляр
   ]
-  object_position_telescope = (0, 10)  # Далекий объект
-  ray_angles_telescope = [np.radians(-1), np.radians(0), np.radians(1)]
+  object_positions_telescope = [(0, -2), (0, 0), (0, 2)]  # Три объекта
+  ray_angles_telescope = [0, 0, 0]  # Один прямой луч из каждого объекта
   print("Симуляция: Телескоп")
-  run_simulation(lens_system_telescope, object_position_telescope, ray_angles_telescope)
+  
+  # Рисуем все объекты и их лучи на одном графике
+  fig, ax = plt.subplots()
+  for object_position, ray_angle in zip(object_positions_telescope, ray_angles_telescope):
+    setup_simulation(lens_system_telescope, object_position, [np.radians(ray_angle)], ax=ax)
+  plt.show()
