@@ -5,18 +5,18 @@ import matplotlib.animation as animation
 # === Параметры симуляции ===
 width, height = 50, 50
 num_particles = 5000
-max_steps = 1000
+max_steps = 1500
 start = (width // 2, height // 2)
-directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)]  # Вверх, вниз, влево, вправо, остаемся на месте
 
 # === Инициализация ===
-temperature_map = np.zeros((width, height), dtype=int)         # Накопленная температура
-escape_counts = np.zeros(max_steps + 1, dtype=int)             # Сколько частиц вышло на каждом шаге
-particle_positions = [[start] for _ in range(num_particles)]   # Пути частиц
-current_density_map = np.zeros((width, height), dtype=int)     # Частицы в ячейках сейчас
-step_count_per_particle = np.full(num_particles, -1, dtype=int)   # Шаг выхода для каждой частицы
-time_in_radiator = np.zeros(num_particles, dtype=int)          # Время каждой частицы в радиаторе
-temperature_distribution = []  # Список для сохранения температурных карт
+temperature_map = np.zeros((width, height), dtype=int)          # Накопленная температура
+escape_counts = np.zeros(max_steps + 1, dtype=int)              # Сколько частиц вышло на каждом шаге
+particle_positions = [[start] for _ in range(num_particles)]    # Пути частиц
+current_density_map = np.zeros((width, height), dtype=int)      # Частицы в ячейках сейчас
+step_count_per_particle = np.full(num_particles, -1, dtype=int) # Шаг выхода для каждой частицы
+time_in_radiator = np.zeros(num_particles, dtype=int)           # Время каждой частицы в радиаторе
+temperature_distribution = []                                   # Список для сохранения температурных карт
 
 # Новый список для хранения среднего количества шагов до выхода на каждом шаге
 avg_steps_to_exit_over_time = []
@@ -25,7 +25,7 @@ avg_steps_to_exit_over_time = []
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
 # Карта температур
-im1 = ax1.imshow(temperature_map.T, cmap='hot', origin='lower', vmin=0, vmax=10)
+im1 = ax1.imshow(temperature_map.T, cmap='plasma', origin='lower', vmin=0, vmax=10)
 ax1.set_title("Карта температур (накопленная)")
 ax1.set_xlabel("X")
 ax1.set_ylabel("Y")
@@ -66,7 +66,7 @@ def update(step):
     current_density_map[x, y] += 1
 
     # Случайный шаг
-    dx, dy = directions[np.random.randint(4)]
+    dx, dy = directions[np.random.randint(0, len(directions))]
     new_x, new_y = x + dx, y + dy
     particle_positions[i].append((new_x, new_y))
 
@@ -86,12 +86,12 @@ def update(step):
 
   # Обновляем текст с суммарным количеством тепла
   total_heat = np.sum(current_density_map)
-  heat_text_ax2.set_text(f"Суммарное тепло: {total_heat}")
+  heat_text_ax2.set_text(f"Суммарное тепло: {total_heat} (у.е.)")
 
   return [im1, im2, heat_text_ax2]
 
 # Анимация
-ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=50, repeat=False)
+ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=10, repeat=False)
 plt.show()
 
 # === Постобработка ===
@@ -106,7 +106,7 @@ print(f"Среднее количество шагов до выхода: {int(a
 # Карта температур
 plt.figure(figsize=(6, 5))
 plt.title("Карта температур (частоты посещений)")
-plt.imshow(temperature_map.T, cmap='hot', origin='lower')
+plt.imshow(temperature_map.T, cmap='plasma', origin='lower')
 plt.colorbar(label='Количество посещений')
 plt.xlabel("X (ширина)")
 plt.ylabel("Y (высота)")
@@ -119,10 +119,18 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 # График времени выхода частиц
 steps = np.arange(max_steps + 1)
 ax1.set_title("Распределение времени выхода тепловых частиц")
-ax1.plot(steps, escape_counts, color='blue')
+ax1.plot(steps, escape_counts, color='blue', label='Исходные данные')
 ax1.set_xlabel("Шаг симуляции")
 ax1.set_ylabel("Частиц вышло")
 ax1.grid(True)
+
+# Добавляем сглаживающую линию (скользящее среднее)
+window = 150  # ширина окна сглаживания
+if len(escape_counts) >= window:
+    smooth = np.convolve(escape_counts, np.ones(window)/window, mode='same')
+    ax1.plot(steps, smooth, color='red', linewidth=2, label=f'Скользящее среднее (окно={window})')
+
+ax1.legend()
 
 # График изменения среднего количества шагов до выхода
 ax2.set_title("Изменение среднего количества шагов до выхода")
@@ -130,7 +138,17 @@ ax2.plot(avg_steps_to_exit_over_time, label="Среднее количество
 ax2.set_xlabel("Шаг симуляции")
 ax2.set_ylabel("Среднее количество шагов")
 ax2.grid(True)
-ax2.legend()
+ax2.legend(loc='lower right')  # Перемещаем легенду
+
+# Добавляем текст с итоговым средним количеством шагов до выхода
+ax2.text(
+  0.02, 0.95,
+  f"Итоговое среднее: {int(avg_steps_total)} шагов",
+  transform=ax2.transAxes,
+  color='black',
+  fontsize=12,
+  bbox=dict(facecolor='white', alpha=0.7)
+)
 
 plt.tight_layout()
 plt.show()
