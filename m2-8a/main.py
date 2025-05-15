@@ -40,45 +40,45 @@ plt.tight_layout()
 
 # === Обновление на каждом шаге ===
 def update(step):
-    global particle_positions, temperature_map, escape_counts, current_density_map
-    current_density_map.fill(0)
+  global particle_positions, temperature_map, escape_counts, current_density_map
+  current_density_map.fill(0)
 
-    for i in range(len(particle_positions)):
-        if step < len(particle_positions[i]):
-            continue  # Частица уже вышла
-        x, y = particle_positions[i][-1]
+  for i in range(len(particle_positions)):
+    if step < len(particle_positions[i]):
+      continue  # Частица уже вышла
+    x, y = particle_positions[i][-1]
 
-        # Частица вышла за пределы
-        if not (0 <= x < width and 0 <= y < height):
-            if step_count_per_particle[i] == -1:  # Только если это первое пересечение границы
-                escape_counts[step] += 1
-                step_count_per_particle[i] = step
-                time_in_radiator[i] = len(particle_positions[i])
-            particle_positions[i].append((-1, -1))  # Маркер выхода
-            continue
+    # Частица вышла за пределы
+    if not (0 <= x < width and 0 <= y < height):
+      if step_count_per_particle[i] == -1:  # Только если это первое пересечение границы
+        escape_counts[step] += 1
+        step_count_per_particle[i] = step
+        time_in_radiator[i] = len(particle_positions[i])
+      particle_positions[i].append((-1, -1))  # Маркер выхода
+      continue
 
-        # Обновление температуры и плотности
-        temperature_map[x, y] += 1
-        current_density_map[x, y] += 1
+    # Обновление температуры и плотности
+    temperature_map[x, y] += 1
+    current_density_map[x, y] += 1
 
-        # Случайный шаг
-        dx, dy = directions[np.random.randint(4)]
-        new_x, new_y = x + dx, y + dy
-        particle_positions[i].append((new_x, new_y))
+    # Случайный шаг
+    dx, dy = directions[np.random.randint(4)]
+    new_x, new_y = x + dx, y + dy
+    particle_positions[i].append((new_x, new_y))
 
-    # Сохраняем копию температурной карты
-    temperature_distribution.append(temperature_map.copy())
+  # Сохраняем копию температурной карты
+  temperature_distribution.append(temperature_map.copy())
 
-    # Обновляем массив со средними шагами до выхода
-    valid_steps = step_count_per_particle[step_count_per_particle >= 0]
-    if len(valid_steps) > 0:
-        avg_steps_to_exit_over_time.append(np.mean(valid_steps))
-    else:
-        avg_steps_to_exit_over_time.append(0)
+  # Обновляем массив со средними шагами до выхода
+  valid_steps = step_count_per_particle[step_count_per_particle >= 0]
+  if len(valid_steps) > 0:
+    avg_steps_to_exit_over_time.append(np.mean(valid_steps))
+  else:
+    avg_steps_to_exit_over_time.append(0)
 
-    im1.set_array(temperature_map.T)
-    im2.set_array(current_density_map.T)
-    return [im1, im2]
+  im1.set_array(temperature_map.T)
+  im2.set_array(current_density_map.T)
+  return [im1, im2]
 
 # Анимация
 ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=50, repeat=False)
@@ -88,10 +88,8 @@ plt.show()
 # Среднее количество шагов до выхода
 final_valid_steps = step_count_per_particle[step_count_per_particle >= 0]
 avg_steps_total = np.mean(final_valid_steps)
-avg_time_in_radiator = np.mean(time_in_radiator[time_in_radiator > 0])
 
-print(f"Среднее количество шагов до выхода: {avg_steps_total}")
-print(f"Среднее время нахождения в радиаторе: {avg_time_in_radiator}")
+print(f"Среднее количество шагов до выхода: {int(avg_steps_total)}")
 
 # Построение финальных графиков ===
 
@@ -105,22 +103,24 @@ plt.ylabel("Y (высота)")
 plt.grid(False)
 plt.show()
 
+# График времени выхода частиц и изменения среднего количества шагов до выхода
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
 # График времени выхода частиц
 steps = np.arange(max_steps + 1)
-plt.figure(figsize=(6, 4))
-plt.title("Распределение времени выхода тепловых частиц")
-plt.plot(steps, escape_counts, color='blue')
-plt.xlabel("Шаг симуляции")
-plt.ylabel("Частиц вышло")
-plt.grid(True)
-plt.show()
+ax1.set_title("Распределение времени выхода тепловых частиц")
+ax1.plot(steps, escape_counts, color='blue')
+ax1.set_xlabel("Шаг симуляции")
+ax1.set_ylabel("Частиц вышло")
+ax1.grid(True)
 
 # График изменения среднего количества шагов до выхода
-plt.figure(figsize=(6, 4))
-plt.plot(avg_steps_to_exit_over_time, label="Среднее количество шагов до выхода", color='green')
-plt.xlabel("Шаг симуляции")
-plt.ylabel("Среднее количество шагов")
-plt.title("Изменение среднего количества шагов до выхода")
-plt.grid(True)
-plt.legend()
+ax2.set_title("Изменение среднего количества шагов до выхода")
+ax2.plot(avg_steps_to_exit_over_time, label="Среднее количество шагов до выхода", color='green')
+ax2.set_xlabel("Шаг симуляции")
+ax2.set_ylabel("Среднее количество шагов")
+ax2.grid(True)
+ax2.legend()
+
+plt.tight_layout()
 plt.show()
