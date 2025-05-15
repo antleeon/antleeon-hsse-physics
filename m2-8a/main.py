@@ -36,6 +36,10 @@ ax2.set_title("Текущая плотность тепловых частиц")
 ax2.set_xlabel("X")
 ax2.set_ylabel("Y")
 
+# Добавляем текст для отображения суммарного тепла на втором графике
+heat_text_ax2 = ax2.text(0.02, 0.95, '', transform=ax2.transAxes, color='white', fontsize=12, 
+                         bbox=dict(facecolor='black', alpha=0.5))
+
 plt.tight_layout()
 
 # === Обновление на каждом шаге ===
@@ -76,9 +80,15 @@ def update(step):
   else:
     avg_steps_to_exit_over_time.append(0)
 
+  # Обновляем графики
   im1.set_array(temperature_map.T)
   im2.set_array(current_density_map.T)
-  return [im1, im2]
+
+  # Обновляем текст с суммарным количеством тепла
+  total_heat = np.sum(current_density_map)
+  heat_text_ax2.set_text(f"Суммарное тепло: {total_heat}")
+
+  return [im1, im2, heat_text_ax2]
 
 # Анимация
 ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=50, repeat=False)
